@@ -58,8 +58,8 @@ class Database
         }
 
         if ($this->options['dsn']) {
-            $dsn = explode(':', $this->options['dsn']);
-            $this->setSQLDialect($dsn[0]);
+            //$dsn = explode(':', $this->options['dsn']);
+            //$this->setSQLDialect($dsn[0]); SqlQueryBuilder
         }
     }
 
@@ -68,7 +68,7 @@ class Database
     /**
      * Connect to the database.
      *
-     * @param boolean $debug default false, set to true to throw exception with full connection details 
+     * @param boolean $debug default false, set to true to throw exception with full connection details
      * when connection fails.
      *
      * @return void
@@ -90,9 +90,7 @@ class Database
 
                 $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $this->options['fetch_mode']);
                 $this->db->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-
-            } catch(\Exception $e) {
-
+            } catch (\Exception $e) {
                 if ($debug || $this->options['debug_connect']) {
                     // For debug purpose, shows all connection details
                     throw $e;
@@ -101,7 +99,6 @@ class Database
                     throw new \PDOException("Could not connect to database, hiding connection details. Connect using 'debug' to see the full exception message.");
                 }
             }
-
         } else {
             throw new \Exception("You can not connect, missing dsn.");
         }
@@ -114,13 +111,13 @@ class Database
     /**
      * Set and unset verbose mode to display queries made.
      *
-     * @param boolean $on set true to display queries made through echo, false to disable.
+     * @param boolean $mode set true to display queries made through echo, false to disable.
      *
      * @return void
      */
-    public function setVerbose($on = true)
+    public function setVerbose($mode = true)
     {
-        $this->options['verbose'] = $on;
+        $this->options['verbose'] = $mode;
     }
 
 
@@ -145,7 +142,7 @@ class Database
 
     /**
      * Set fetchmode to insert Fetch one resultset from previous select statement as an object.
-     * 
+     *
      * @param string $class to insert values into.
      *
      * @return boolean Returns TRUE on success or FALSE on failure.
@@ -177,7 +174,7 @@ class Database
 
     /**
      * Save query-history in session, useful as a flashmemory when redirecting to another page.
-     * 
+     *
      * @param string $extra enables to save some extra debug information.
      *
      * @return void
@@ -226,7 +223,7 @@ class Database
 
     /**
      * Get a html representation of all queries made, for debugging and analysing purpose.
-     * 
+     *
      * @return string with html.
      */
     public function dump()
@@ -257,11 +254,9 @@ class Database
         $offset = -1;
 
         foreach ($params as $val) {
-
             $offset = strpos($query, '?', $offset + 1);
 
             if (is_array($val)) {
-            
                 $nrOfItems = count($val);
             
                 if ($nrOfItems) {
@@ -282,7 +277,7 @@ class Database
 
     /**
      * Execute a select-query with arguments and return the resultset.
-     * 
+     *
      * @param string  $query      the SQL query with ?.
      * @param array   $params     array which contains the argument to replace ?.
      *
@@ -301,7 +296,7 @@ class Database
 
     /**
      * Fetch all resultset from previous select statement.
-     * 
+     *
      * @return array with resultset.
      */
     public function fetchAll()
@@ -313,7 +308,7 @@ class Database
 
     /**
      * Fetch one resultset from previous select statement.
-     * 
+     *
      * @return array with resultset.
      */
     public function fetchOne()
@@ -325,7 +320,7 @@ class Database
 
     /**
      * Fetch one resultset from previous select statement as an object.
-     * 
+     *
      * @param object $class which type of object to instantiate.
      *
      * @return array with resultset.
@@ -339,7 +334,7 @@ class Database
 
     /**
      * Fetch one resultset from previous select statement as an object.
-     * 
+     *
      * @param object $object to insert values into.
      *
      * @return array with resultset.
@@ -399,6 +394,7 @@ class Database
                 . $this->db->errorCode()
                 . " "
                 . htmlentities(print_r($this->db->errorInfo(), 1));
+                echo $query;
             throw new \Exception($msg);
         }
 

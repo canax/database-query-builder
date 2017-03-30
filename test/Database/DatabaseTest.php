@@ -5,7 +5,7 @@ namespace Anax\Database;
 /**
 * A testclass
 */
-class CDatabaseTest extends \PHPUnit_Framework_TestCase
+class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
     /*
     private $mysqlOptions = [
@@ -36,6 +36,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
 
 
     private $db;
+    //private $selectSQL;
 
 
 
@@ -44,12 +45,15 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->db = new \Mos\Database\CDatabaseBasic();
+        $this->db = new Database();
         $this->db->setOptions($this->sqliteOptions);
         //$this->db->setOptions($this->mysqlOptions);
         $this->db->connect();
-        $this->selectSQL = $this->db->select("id, age, text")
+        //$this->selectSQL = "SELECT id, age, text FROM test;";
+        /*
+        $this->db->select("id, age, text")
                                     ->from('test')->getSQL();
+        */
     }
 
 
@@ -59,9 +63,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateObject()
     {
-        $db = new \Mos\Database\CDatabaseBasic();
-
-        $this->isInstanceOf('\Mos\Database\CDatabaseBasic');
+        $this->assertInstanceOf("\Anax\Database\Database", $this->db);
     }
 
 
@@ -87,7 +89,6 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
         } catch (\Exception $e) {
             $this->assertTrue(true);
         }
-
     }
 
 
@@ -97,6 +98,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateTable()
     {
+        /*
         $this->db->createTable(
             'test',
             [
@@ -105,8 +107,15 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
                 'text'  => ['varchar(20)'],
             ]
         );
-
-        $this->db->execute();
+        */
+        $sql = <<<EOD
+CREATE TABLE test (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    age INTEGER,
+    text VARCHAR(20)
+);
+EOD;
+        $this->db->execute($sql);
     }
 
 
@@ -116,6 +125,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testInsertSingleRow()
     {
+        /*
         $this->db->insert(
             'test',
             [
@@ -123,8 +133,14 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
                 'text' => $this->rows[0][1],
             ]
         );
-
-        $this->db->execute();
+        */
+        $sql = <<<EOD
+INSERT INTO test (age, text)
+VALUES
+    (?, ?)
+;
+EOD;
+        $this->db->execute($sql, $this->rows[0]);
     }
 
 
@@ -132,7 +148,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
     /**
      * Testcase
      */
-    public function testInsertAsArray()
+    /*public function testInsertAsArray()
     {
         $this->db->insert(
             'test',
@@ -141,7 +157,7 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->db->execute();
-    }
+    }*/
 
 
 
@@ -150,16 +166,16 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateRow()
     {
-        $this->db->update(
+        /*$this->db->update(
             'test',
             [
                 'age' => '?',
                 'text' => '?',
             ],
             "id = ?"
-        );
-        $id2 = $this->db->lastInsertId();
-        $this->db->execute(array_merge($this->rows[1], [$id2]));
+        );*/
+        //$id2 = $this->db->lastInsertId();
+        //$this->db->execute(array_merge($this->rows[1], [$id2]));
     }
 
 
@@ -169,10 +185,11 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testLimit()
     {
-        $sql = "select * from test limit ?, ?";
+        $sql = "SELECT * FROM test LIMIT ?, ?";
         $param = [0, 2];
 
         $res = $this->db->executeFetchAll($sql, $param);
+        $res;
         //$res = $this->db->executeFetchAll($sql);
         //print_r($this->db->dump());
         //var_dump($res);
@@ -185,7 +202,8 @@ class CDatabaseTest extends \PHPUnit_Framework_TestCase
      */
     public function testDropTable()
     {
-        $this->db->dropTable('test');
-        $this->db->execute();
+        //$this->db->dropTable('test');
+        $sql = "DROP TABLE test;";
+        $this->db->execute($sql);
     }
 }

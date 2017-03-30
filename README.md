@@ -8,7 +8,7 @@ Anax Database
 [![Build Status](https://scrutinizer-ci.com/g/canax/database/badges/build.png?b=master)](https://scrutinizer-ci.com/g/canax/database/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/canax/database/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/canax/database/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/canax/database/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/canax/database/?branch=master)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/6dc5e622-2087-4fb5-969e-1609eed3c85b/mini.png)](https://insight.sensiolabs.com/projects/6dc5e622-2087-4fb5-969e-1609eed3c85b)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/d831fd4c-b7c6-4ff0-9a83-102440af8929/mini.png)](https://insight.sensiolabs.com/projects/d831fd4c-b7c6-4ff0-9a83-102440af8929)
 
 Anax Database module.
 
