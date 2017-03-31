@@ -1,7 +1,7 @@
 {
-    "name": "anax/view",
+    "name": "anax/database",
     "type": "library",
-    "description": "Anax View module.",
+    "description": "Anax Database module.",
     "keywords": ["boilerplate", "framework", "mvc", "micro", "education"],
     "homepage": "https://dbwebb.se/anax",
     "license": "MIT",
@@ -14,7 +14,7 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/canax/view/issues"
+        "issues": "https://github.com/canax/database/issues"
     },
     "autoload": {
         "psr-4": { 
@@ -23,7 +23,9 @@
     },
     "require": {
         "php": ">=5.6",
-        "anax/common": "^1.0"
+    },
+    "suggest": {
+        "anax/common": "To enhance integration with Anax framework."
     },
     "require-dev": {
         "php": ">=5.6"
