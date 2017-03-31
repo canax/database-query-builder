@@ -12,11 +12,11 @@ class DatabaseConfigure extends Database implements \Anax\Common\ConfigureInterf
 
 
     /**
-     * Set options and connection details from configuration.
+     * Set options by using configuration.
      *
      * @return void
      */
-    public function setOptions()
+    public function setDefaultsFromConfiguration()
     {
         parent::setOptions($this->config);
     }

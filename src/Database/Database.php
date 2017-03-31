@@ -68,10 +68,11 @@ class Database
     /**
      * Connect to the database.
      *
-     * @param boolean $debug default false, set to true to throw exception with full connection details
-     * when connection fails.
+     * @param boolean $debug default false, set to true to throw exception
+     *                       with full connection details when connection
+     *                       fails.
      *
-     * @return void
+     * @return self
      */
     public function connect($debug = false)
     {
@@ -104,6 +105,7 @@ class Database
         }
 
         $this->loadHistory();
+        return $this;
     }
 
 
