@@ -4,9 +4,10 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "13a9fa32ebabb65196336bd73733d97c",
-    "content-hash": "c8a4a05e8eaace35c4bd40ceb8bfb0c7",
-    "packages": [
+    "hash": "838c5895cc94ba0b3c4bc00d831eb6fd",
+    "content-hash": "40ec491a9b73a6d3de43866d0a41dddf",
+    "packages": [],
+    "packages-dev": [
         {
             "name": "anax/common",
             "version": "v1.0.10",
@@ -60,7 +61,6 @@
             "time": "2017-03-26 21:22:33"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

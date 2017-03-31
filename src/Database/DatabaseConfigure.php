@@ -5,9 +5,9 @@ namespace Anax\Database;
 /**
  * Namespaced exception.
  */
-class DatabaseConfigurable extends Database implements \Anax\Common\ConfigurableInterface
+class DatabaseConfigure extends Database implements \Anax\Common\ConfigureInterface
 {
-    use \Anax\Common\ConfigurableTrait;
+    use \Anax\Common\ConfigureTrait;
 
 
 

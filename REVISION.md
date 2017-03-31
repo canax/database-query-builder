@@ -1,6 +1,13 @@
 Revision history
 =================================
 
+v1.0.2 (2017-03-31)
+---------------------------------
+
+* Rename DatabaseConfigurable to DatabaseConfigure.
+* Fix error in composer.json.
+
+
 v1.0.1 (2017-03-31)
 ---------------------------------
 
