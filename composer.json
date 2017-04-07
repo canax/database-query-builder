@@ -28,7 +28,6 @@
         "anax/common": "To enhance integration with Anax framework."
     },
     "require-dev": {
-        "php": ">=5.6",
         "anax/common": "^1.0"
     }
 }

@@ -1,6 +1,14 @@
 Revision history
 =================================
 
+v1.0.4 (2017-04-07)
+---------------------------------
+
+* Rewrote Database class and moved debug utilities to DatabaseDebug.
+* Cleaned up Database.
+* Cleaned up DatabaseTest.
+
+
 v1.0.3 (2017-03-31)
 ---------------------------------
 
