@@ -3,19 +3,19 @@
 namespace Anax\Database;
 
 /**
- * Database wrapper, provides a database API on top of PHP PDO.
+ * Database wrapper, provides a database API on top of PHP PDO for
+ * enhancing the API and dealing with error reporting and tracking.
  */
 class Database
 {
     /**
-     * Properties
+     * @var array        $options used when creating the PDO object
+     * @var PDO          $pdo     the PDO object
+     * @var PDOStatement $stmt    the latest PDOStatement used
      */
-    private $options;                   // Options used when creating the PDO object
-    private $db   = null;               // The PDO object
-    private $stmt = null;               // The latest statement used to execute a query
-    private static $numQueries = 0;     // Count all queries made
-    private static $queries    = [];    // Save all queries for debugging purpose
-    private static $params     = [];    // Save all parameters for debugging purpose
+    private $options;
+    private $pdo = null;
+    private $stmt = null;
 
 
 
@@ -52,15 +52,6 @@ class Database
             'debug_connect'   => false,
         ];
         $this->options = array_merge($default, $options);
-
-        if ($this->options['table_prefix']) {
-            $this->setTablePrefix($this->options['table_prefix']);
-        }
-
-        if ($this->options['dsn']) {
-            //$dsn = explode(':', $this->options['dsn']);
-            //$this->setSQLDialect($dsn[0]); SqlQueryBuilder
-        }
     }
 
 
@@ -68,189 +59,48 @@ class Database
     /**
      * Connect to the database.
      *
-     * @param boolean $debug default false, set to true to throw exception
-     *                       with full connection details when connection
-     *                       fails.
-     *
      * @return self
+     *
+     * @throws \Anax\Database\Exception
      */
-    public function connect($debug = false)
+    public function connect()
     {
-        if (isset($this->options['dsn'])) {
-            if ($this->options['verbose']) {
-                echo "<p>Connecting to dsn:<br><code>" . $this->options['dsn'] . "</code>";
-            }
-
-            try {
-                $this->db = new \PDO(
-                    $this->options['dsn'],
-                    $this->options['username'],
-                    $this->options['password'],
-                    $this->options['driver_options']
-                );
-
-                $this->db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $this->options['fetch_mode']);
-                $this->db->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-            } catch (\Exception $e) {
-                if ($debug || $this->options['debug_connect']) {
-                    // For debug purpose, shows all connection details
-                    throw $e;
-                } else {
-                    // Hide connection details.
-                    throw new \PDOException("Could not connect to database, hiding connection details. Connect using 'debug' to see the full exception message.");
-                }
-            }
-        } else {
-            throw new \Exception("You can not connect, missing dsn.");
+        if (!isset($this->options['dsn'])) {
+            throw new Exception("You can not connect, missing dsn.");
         }
 
-        $this->loadHistory();
+        try {
+            $this->pdo = new \PDO(
+                $this->options['dsn'],
+                $this->options['username'],
+                $this->options['password'],
+                $this->options['driver_options']
+            );
+
+            $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $this->options['fetch_mode']);
+            $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        } catch (\PDOException $e) {
+            if ($this->options['debug_connect']) {
+                throw $e;
+            }
+            throw new Exception("Could not connect to database, hiding connection details.");
+        }
+
         return $this;
     }
 
 
 
     /**
-     * Set and unset verbose mode to display queries made.
-     *
-     * @param boolean $mode set true to display queries made through echo, false to disable.
-     *
-     * @return void
-     */
-    public function setVerbose($mode = true)
-    {
-        $this->options['verbose'] = $mode;
-    }
-
-
-
-    /**
-     * Set fetch mode. (OBSOLETE?)
-     *
-     * @param int $fetchmode as \PDO::FETCH_OBJ, \PDO::FETCH_CLASS, \PDO::FETCH_INTO, etc.
-     *
-     * @return void
-     */
-    public function setFetchMode($fetchmode = null)
-    {
-        $fetchmode = isset($fetchmode)
-            ? $fetchmode
-            : $this->options['fetch_mode'];
-
-        $this->stmt->setFetchMode($fetchmode);
-    }
-
-
-
-    /**
-     * Set fetchmode to insert Fetch one resultset from previous select statement as an object.
-     *
-     * @param string $class to insert values into.
-     *
-     * @return boolean Returns TRUE on success or FALSE on failure.
-     */
-    public function setFetchModeClass($class)
-    {
-        return $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
-    }
-
-
-
-    /**
-     * Load query-history from session if available.
-     *
-     * @return int number of database queries made.
-     */
-    public function loadHistory()
-    {
-        $key = $this->options['session_key'];
-        if (isset($_SESSION['CDatabase'])) {
-            self::$numQueries = $_SESSION[$key]['numQueries'];
-            self::$queries    = $_SESSION[$key]['queries'];
-            self::$params     = $_SESSION[$key]['params'];
-            unset($_SESSION[$key]);
-        }
-    }
-
-
-
-    /**
-     * Save query-history in session, useful as a flashmemory when redirecting to another page.
-     *
-     * @param string $extra enables to save some extra debug information.
-     *
-     * @return void
-     */
-    public function saveHistory($extra = null)
-    {
-        if (!is_null($extra)) {
-            self::$queries[] = $extra;
-            self::$params[] = null;
-        }
-
-        self::$queries[] = 'Saved query-history to session.';
-        self::$params[] = null;
-
-        $key = $this->options['session_key'];
-        $_SESSION[$key]['numQueries'] = self::$numQueries;
-        $_SESSION[$key]['queries']    = self::$queries;
-        $_SESSION[$key]['params']     = self::$params;
-    }
-
-
-
-    /**
-     * Get how many queries have been processed.
-     *
-     * @return int number of database queries made.
-     */
-    public function getNumQueries()
-    {
-        return self::$numQueries;
-    }
-
-
-
-    /**
-     * Get all the queries that have been processed.
-     *
-     * @return array with queries.
-     */
-    public function getQueries()
-    {
-        return [self::$queries, self::$params];
-    }
-
-
-
-    /**
-     * Get a html representation of all queries made, for debugging and analysing purpose.
-     *
-     * @return string with html.
-     */
-    public function dump()
-    {
-        $html  = '<p><i>You have made ' . self::$numQueries . ' database queries.</i></p><pre>';
-        
-        foreach (self::$queries as $key => $val) {
-            $params = empty(self::$params[$key]) ? null : htmlentities(print_r(self::$params[$key], 1), null, 'UTF-8') . '<br/><br/>';
-            $html .= htmlentities($val, null, 'UTF-8') . '<br/><br/>' . $params;
-        }
-        
-        return $html . '</pre>';
-    }
-
-
-
-    /**
-     * Extend params array to support arrays in it, extract array items and add to $params and insert ? for each entry.
+     * Support arrays in params, extract array items and add to $params
+     * and insert ? for each entry in the array.
      *
      * @param string $query  as the query to prepare.
      * @param array  $params the parameters that may contain arrays.
      *
      * @return array with query and params.
      */
-    protected function expandParamArray($query, $params)
+    private function expandParamArray($query, $params)
     {
         $param = [];
         $offset = -1;
@@ -260,9 +110,12 @@ class Database
 
             if (is_array($val)) {
                 $nrOfItems = count($val);
-            
+
                 if ($nrOfItems) {
-                    $query = substr($query, 0, $offset) . str_repeat('?,', $nrOfItems  - 1) . '?' . substr($query, $offset + 1);
+                    $query = substr($query, 0, $offset)
+                        . str_repeat('?,', $nrOfItems  - 1)
+                        . '?'
+                        . substr($query, $offset + 1);
                     $param = array_merge($param, $val);
                 } else {
                     $param[] = null;
@@ -272,7 +125,7 @@ class Database
             }
         }
 
-        return array($query, $param);
+        return [$query, $param];
     }
 
 
@@ -280,16 +133,13 @@ class Database
     /**
      * Execute a select-query with arguments and return the resultset.
      *
-     * @param string  $query      the SQL query with ?.
-     * @param array   $params     array which contains the argument to replace ?.
+     * @param string $query  the SQL statement
+     * @param array  $params the params array
      *
-     * @return array with resultset.
+     * @return array with resultset
      */
-    public function executeFetchAll(
-        $query = null,
-        $params = []
-    ) {
-
+    public function executeFetchAll($query, $params = [])
+    {
         $this->execute($query, $params);
         return $this->fetchAll();
     }
@@ -297,7 +147,7 @@ class Database
 
 
     /**
-     * Fetch all resultset from previous select statement.
+     * Fetch all resultset.
      *
      * @return array with resultset.
      */
@@ -309,7 +159,7 @@ class Database
 
 
     /**
-     * Fetch one resultset from previous select statement.
+     * Fetch one resultset.
      *
      * @return array with resultset.
      */
@@ -321,7 +171,7 @@ class Database
 
 
     /**
-     * Fetch one resultset from previous select statement as an object.
+     * Fetch one resultset as an object from this class.
      *
      * @param object $class which type of object to instantiate.
      *
@@ -335,7 +185,7 @@ class Database
 
 
     /**
-     * Fetch one resultset from previous select statement as an object.
+     * Fetch one resultset into an object.
      *
      * @param object $object to insert values into.
      *
@@ -352,62 +202,25 @@ class Database
     /**
      * Execute a SQL-query and ignore the resultset.
      *
-     * @param string  $query  the SQL query with ?.
-     * @param array   $params array which contains the argument to replace ?.
-     *
-     * @throws Exception when failing to prepare question.
+     * @param string $query  the SQL statement
+     * @param array  $params the params array
      *
      * @return boolean returns TRUE on success or FALSE on failure.
+     *
+     * @throws Exception when failing to prepare question.
      */
-    public function execute(
-        $query = null,
-        $params = []
-    ) {
-
-        if (is_null($query)) {
-            $query = $this->getSQL();
-        } else if (is_array($query)) {
-            $params = $query;
-            $query = $this->getSQL();
-        }
-
+    public function execute($query, $params = [])
+    {
         list($query, $params) = $this->expandParamArray($query, $params);
 
-        self::$queries[] = $query;
-        self::$params[]  = $params;
-        self::$numQueries++;
-
-        if ($this->options['verbose']) {
-            echo "<p>Num query = "
-                . self::$numQueries
-                . "</p><p>Query = </p><pre>"
-                . htmlentities($query)
-                . "</pre>"
-                . (empty($params)
-                    ? null
-                    : "<p>Params:</p><pre>" . htmlentities(print_r($params, 1)) . "</pre>"
-                );
-        }
-
-        $this->stmt = $this->db->prepare($query);
-
+        $this->stmt = $this->pdo->prepare($query);
         if (!$this->stmt) {
-            $msg = "Error in preparing query: "
-                . $this->db->errorCode()
-                . " "
-                . htmlentities(print_r($this->db->errorInfo(), 1));
-                echo $query;
-            throw new \Exception($msg);
+            $this->statementException($sql, $param);
         }
 
         $res = $this->stmt->execute($params);
-
         if (!$res) {
-            $msg = "Error in executing query: "
-                . $this->stmt->errorCode()
-                . " "
-                . htmlentities(print_r($this->stmt->errorInfo(), 1));
-            throw new \Exception($msg);
+            $this->statementException($sql, $param);
         }
 
         return $res;
@@ -416,22 +229,46 @@ class Database
 
 
     /**
-     * Return last insert id.
+     * Through exception with detailed message.
+     *
+     * @param string       $sql     statement to execute
+     * @param array        $param   to match ? in statement
+     *
+     * @return void
+     *
+     * @throws \Anax\Database\Exception
+     */
+    private function statementException($sql, $param)
+    {
+        throw new Exception(
+            $this->stmt->errorInfo()[2]
+            . "<br><br>SQL:<br><pre>$sql</pre><br>PARAMS:<br><pre>"
+            . implode($param, "\n")
+            . "</pre>"
+        );
+    }
+
+
+
+    /**
+     * Return last insert id from autoincremented key on INSERT.
+     *
+     * @return integer as last insert id.
      */
     public function lastInsertId()
     {
-        return $this->db->lastInsertId();
+        return $this->pdo->lastInsertId();
     }
 
 
 
     /**
     * Return rows affected of last INSERT, UPDATE, DELETE
+    *
+    * @return integer as rows affected on last statement
     */
     public function rowCount()
     {
-        return is_null($this->stmt)
-            ? $this->stmt
-            : $this->stmt->rowCount();
+        return $this->stmt->rowCount();
     }
 }
