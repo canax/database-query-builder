@@ -14,10 +14,38 @@ Anax Database module.
 
 
 
+Features
+------------------
+
+Current features are:
+
+`Anax\Database\Database`
+
+* Wrapper for PDO with verbose exceptions for easier development.
+
+`Anax\Database\DatabaseConfigure`
+
+* With support for reading configuraiton file from Anax.
+
+
+
+### To be developed
+
+* Caching of SQL queries.
+
+
+
 License
 ------------------
 
 This software carries a MIT license.
+
+
+
+Usage
+------------------
+
+Short examples on how to use Database.
 
 
 
