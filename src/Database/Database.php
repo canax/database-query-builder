@@ -141,7 +141,66 @@ class Database
     public function executeFetchAll($query, $params = [])
     {
         $this->execute($query, $params);
-        return $this->fetchAll();
+        return $this->stmt->fetchAll();
+    }
+
+
+
+    /**
+     * Execute a select-query with arguments and return the first row
+     * in the resultset.
+     *
+     * @param string $query  the SQL statement
+     * @param array  $params the params array
+     *
+     * @return array with resultset
+     */
+    public function executeFetch($query, $params = [])
+    {
+        $this->execute($query, $params);
+        return $this->stmt->fetch();
+    }
+
+
+
+    /**
+     * Execute a select-query with arguments and insert the results into
+     * a new object of the class.
+     *
+     * @param string $query  the SQL statement
+     * @param array  $params the params array
+     * @param string $class  the class to create an object of and insert into
+     *
+     * @return array with resultset
+     */
+    public function executeFetchClass($query, $params, $class)
+    {
+        $this->execute($query, $params);
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+        return $this->stmt->fetch();
+    }
+
+
+
+    /**
+     * Execute a select-query with arguments and insert the results into
+     * an existing object.
+     *
+     * @param string $query  the SQL statement
+     * @param array  $params the params array
+     * @param string $object the existing object to insert into
+     *
+     * @return array with resultset
+     */
+    public function executeFetchInto($sql, $param, $object = null)
+    {
+        if (!$object) {
+            $object = $param;
+            $param = [];
+        }
+        $this->execute($sql, $param);
+        $this->stmt->setFetchMode(\PDO::FETCH_INTO, $object);
+        return $this->stmt->fetch();
     }
 
 
@@ -163,7 +222,7 @@ class Database
      *
      * @return array with resultset.
      */
-    public function fetchOne()
+    public function fetch()
     {
         return $this->stmt->fetch();
     }
@@ -171,15 +230,16 @@ class Database
 
 
     /**
-     * Fetch one resultset as an object from this class.
+     * Fetch one resultset as a new object from this class.
      *
      * @param object $class which type of object to instantiate.
      *
      * @return array with resultset.
      */
-    public function fetchObject($class)
+    public function fetchClass($class)
     {
-        return $this->stmt->fetchObject($class);
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+        return $this->stmt->fetch();
     }
 
 
@@ -242,9 +302,16 @@ class Database
     {
         throw new Exception(
             $this->stmt->errorInfo()[2]
-            . "<br><br>SQL:<br><pre>$sql</pre><br>PARAMS:<br><pre>"
+            . "<br><br>SQL ("
+            . substr_count($sql, "?")
+            . " params):<br><pre>$sql</pre><br>PARAMS ("
+            . count($param)
+            . "):<br><pre>"
             . implode($param, "\n")
             . "</pre>"
+            . ((count(array_filter(array_keys($param), 'is_string')) > 0)
+                ? "WARNING your params array has keys, should only have values."
+                : null)
         );
     }
 
@@ -270,5 +337,32 @@ class Database
     public function rowCount()
     {
         return $this->stmt->rowCount();
+    }
+
+
+
+    /**
+     * Fetch one resultset as an object from this class.
+     * OBSOLETE replaced by fetchClass
+     *
+     * @param object $class which type of object to instantiate.
+     *
+     * @return array with resultset.
+     */
+    public function fetchObject($class)
+    {
+        return $this->stmt->fetchObject($class);
+    }
+
+
+
+    /**
+     * Fetch one resultset. OBSOLETE replace by fetch()
+     *
+     * @return array with resultset.
+     */
+    public function fetchOne()
+    {
+        return $this->stmt->fetch();
     }
 }
