@@ -298,7 +298,7 @@ class Database
      *
      * @throws \Anax\Database\Exception
      */
-    private function statementException($sql, $param)
+    protected function statementException($sql, $param)
     {
         throw new Exception(
             $this->stmt->errorInfo()[2]

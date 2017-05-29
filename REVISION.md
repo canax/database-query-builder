@@ -1,9 +1,10 @@
 Revision history
 =================================
 
-v1.0.4* (2017-04-11)
+v1.0.5 (2017-05-29)
 ---------------------------------
 
+* Make statementException protected to work with extends.
 * Reengineer fetch methods in Database.
 
 
