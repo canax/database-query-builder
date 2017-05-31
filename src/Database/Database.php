@@ -275,12 +275,12 @@ class Database
 
         $this->stmt = $this->pdo->prepare($query);
         if (!$this->stmt) {
-            $this->statementException($query, $param);
+            $this->pdoException($query, $params);
         }
 
         $res = $this->stmt->execute($params);
         if (!$res) {
-            $this->statementException($query, $param);
+            $this->statementException($query, $params);
         }
 
         return $res;
@@ -289,19 +289,20 @@ class Database
 
 
     /**
-     * Through exception with detailed message.
+     * Throw exception using detailed message.
      *
-     * @param string       $query   statement to execute
+     * @param string       $msg     detailed error message from PDO
+     * @param string       $query   query to execute
      * @param array        $param   to match ? in statement
      *
      * @return void
      *
      * @throws \Anax\Database\Exception
      */
-    protected function statementException($query, $param)
+    protected function createException($msg, $query, $param)
     {
         throw new Exception(
-            $this->stmt->errorInfo()[2]
+            $msg
             . "<br><br>SQL ("
             . substr_count($query, "?")
             . " params):<br><pre>$query</pre><br>PARAMS ("
@@ -313,6 +314,40 @@ class Database
                 ? "WARNING your params array has keys, should only have values."
                 : null)
         );
+    }
+
+
+
+    /**
+     * Throw exception when pdo failed using detailed message.
+     *
+     * @param string       $query   query to execute
+     * @param array        $param   to match ? in statement
+     *
+     * @return void
+     *
+     * @throws \Anax\Database\Exception
+     */
+    protected function pdoException($query, $param)
+    {
+        $this->createException($this->pdo->errorInfo()[2], $query, $param);
+    }
+
+
+
+    /**
+     * Throw exception when statement failed using detailed message.
+     *
+     * @param string       $query   query to execute
+     * @param array        $param   to match ? in statement
+     *
+     * @return void
+     *
+     * @throws \Anax\Database\Exception
+     */
+    protected function statementException($query, $param)
+    {
+        $this->createException($this->stmt->errorInfo()[2], $query, $param);
     }
 
 
