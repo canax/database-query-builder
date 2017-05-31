@@ -192,13 +192,13 @@ class Database
      *
      * @return array with resultset
      */
-    public function executeFetchInto($sql, $param, $object = null)
+    public function executeFetchInto($query, $param, $object = null)
     {
         if (!$object) {
             $object = $param;
             $param = [];
         }
-        $this->execute($sql, $param);
+        $this->execute($query, $param);
         $this->stmt->setFetchMode(\PDO::FETCH_INTO, $object);
         return $this->stmt->fetch();
     }
@@ -275,12 +275,12 @@ class Database
 
         $this->stmt = $this->pdo->prepare($query);
         if (!$this->stmt) {
-            $this->statementException($sql, $param);
+            $this->statementException($query, $param);
         }
 
         $res = $this->stmt->execute($params);
         if (!$res) {
-            $this->statementException($sql, $param);
+            $this->statementException($query, $param);
         }
 
         return $res;
@@ -291,20 +291,20 @@ class Database
     /**
      * Through exception with detailed message.
      *
-     * @param string       $sql     statement to execute
+     * @param string       $query   statement to execute
      * @param array        $param   to match ? in statement
      *
      * @return void
      *
      * @throws \Anax\Database\Exception
      */
-    protected function statementException($sql, $param)
+    protected function statementException($query, $param)
     {
         throw new Exception(
             $this->stmt->errorInfo()[2]
             . "<br><br>SQL ("
-            . substr_count($sql, "?")
-            . " params):<br><pre>$sql</pre><br>PARAMS ("
+            . substr_count($query, "?")
+            . " params):<br><pre>$query</pre><br>PARAMS ("
             . count($param)
             . "):<br><pre>"
             . implode($param, "\n")
