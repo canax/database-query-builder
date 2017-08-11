@@ -1,5 +1,6 @@
+# ------------------------------------------------------------------------
 #
-#
+# General stuff
 #
 
 # Detect OS
@@ -28,16 +29,22 @@ THIS_MAKEFILE := $(call WHERE-AM-I)
 # Echo some nice helptext based on the target comment
 HELPTEXT = $(ECHO) "$(ACTION)--->" `egrep "^\# target: $(1) " $(THIS_MAKEFILE) | sed "s/\# target: $(1)[ ]*-[ ]* / /g"` "$(NO_COLOR)"
 
-# Add local bin path for test tools
-#PATH := "./.bin:./vendor/bin:./node_modules/.bin:$(PATH)"
-#SHELL := env PATH=$(PATH) $(SHELL)
-PHPUNIT := .bin/phpunit
-PHPLOC 	:= .bin/phploc
-PHPCS   := .bin/phpcs
-PHPCBF  := .bin/phpcbf
-PHPMD   := .bin/phpmd
-PHPDOC  := .bin/phpdoc
-BEHAT   := .bin/behat
+
+
+# ------------------------------------------------------------------------
+#
+# Specifics
+#
+BIN     := .bin
+PHPUNIT := $(BIN)/phpunit
+PHPLOC 	:= $(BIN)/phploc
+PHPCS   := $(BIN)/phpcs
+PHPCBF  := $(BIN)/phpcbf
+PHPMD   := $(BIN)/phpmd
+PHPDOC  := $(BIN)/phpdoc
+BEHAT   := $(BIN)/behat
+SHELLCHECK := $(BIN)/shellcheck
+BATS := $(BIN)/bats
 
 
 
@@ -70,24 +77,32 @@ clean:
 
 
 
+# target: clean-cache        - Clean the cache.
+.PHONY:  clean-cache
+clean-cache:
+	@$(call HELPTEXT,$@)
+	rm -rf cache/*/*
+
+
+
 # target: clean-all          - Removes generated files and directories.
 .PHONY:  clean-all
-clean-all: clean
+clean-all: clean clean-cache
 	@$(call HELPTEXT,$@)
-	rm -rf .bin vendor composer.lock
+	rm -rf .bin vendor
 
 
 
 # target: check              - Check version of installed tools.
 .PHONY:  check
-check: check-tools-php
+check: check-tools-bash check-tools-php
 	@$(call HELPTEXT,$@)
 
 
 
 # target: test               - Run all tests.
 .PHONY:  test
-test: phpunit phpcs phpmd phploc behat
+test: phpunit phpcs phpmd phploc behat shellcheck bats
 	@$(call HELPTEXT,$@)
 	composer validate
 
@@ -102,14 +117,14 @@ doc: phpdoc
 
 # target: build              - Do all build
 .PHONY:  build
-build: test doc #less-compile less-minify js-minify
+build: test doc #theme less-compile less-minify js-minify
 	@$(call HELPTEXT,$@)
 
 
 
 # target: install            - Install all tools
 .PHONY:  install
-install: prepare install-tools-php
+install: prepare install-tools-php install-tools-bash
 	@$(call HELPTEXT,$@)
 
 
@@ -118,7 +133,7 @@ install: prepare install-tools-php
 .PHONY:  update
 update:
 	@$(call HELPTEXT,$@)
-	git pull
+	[ ! -d .git ] || git pull
 	composer update
 
 
@@ -163,13 +178,13 @@ install-tools-php:
 check-tools-php:
 	@$(call HELPTEXT,$@)
 	php --version && echo
-	$(PHPUNIT) --version
-	$(PHPLOC) --version
-	$(PHPCS) --version && echo
-	$(PHPMD) --version && echo
-	$(PHPCBF) --version && echo
-	$(PHPDOC) --version && echo
-	$(BEHAT) --version && echo
+	which $(PHPUNIT) && $(PHPUNIT) --version
+	which $(PHPLOC) && $(PHPLOC) --version
+	which $(PHPCS) && $(PHPCS) --version && echo
+	which $(PHPMD) && $(PHPMD) --version && echo
+	which $(PHPCBF) && $(PHPCBF) --version && echo
+	which $(PHPDOC) && $(PHPDOC) --version && echo
+	which $(BEHAT) && $(BEHAT) --version && echo
 
 
 
@@ -185,7 +200,7 @@ phpunit: prepare
 .PHONY: phpcs
 phpcs: prepare
 	@$(call HELPTEXT,$@)
-	$(PHPCS) --standard=.phpcs.xml | tee build/phpcs
+	[ ! -f .phpcs.xml ] || $(PHPCS) --standard=.phpcs.xml | tee build/phpcs
 
 
 
@@ -194,9 +209,9 @@ phpcs: prepare
 phpcbf:
 	@$(call HELPTEXT,$@)
 ifneq ($(wildcard test),)
-	$(PHPCBF) --standard=.phpcs.xml
+	[ ! -f .phpcs.xml ] || $(PHPCBF) --standard=.phpcs.xml
 else
-	$(PHPCBF) --standard=.phpcs.xml src
+	[ ! -f .phpcs.xml ] || $(PHPCBF) --standard=.phpcs.xml src
 endif
 
 
@@ -205,7 +220,7 @@ endif
 .PHONY: phpmd
 phpmd: prepare
 	@$(call HELPTEXT,$@)
-	- $(PHPMD) . text .phpmd.xml | tee build/phpmd
+	- [ ! -f .phpmd.xml ] || $(PHPMD) . text .phpmd.xml | tee build/phpmd
 
 
 
@@ -232,9 +247,96 @@ behat:
 	[ ! -d features ] || $(BEHAT)
 
 
+# ------------------------------------------------------------------------
+#
+# Bash
+#
 
-# target: theme              - Execute make build install in theme directory.
+# target: install-tools-bash - Install Bash development tools.
+.PHONY: install-tools-bash
+install-tools-bash:
+	@$(call HELPTEXT,$@)
+	# Shellcheck
+	curl -s https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz | tar -xJ -C build/ && rm -f .bin/shellcheck && ln build/shellcheck-latest/shellcheck .bin/
+
+	# Bats
+	curl -Lso $(BIN)/bats-exec-suite https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-exec-suite
+	curl -Lso $(BIN)/bats-exec-test https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-exec-test
+	curl -Lso $(BIN)/bats-format-tap-stream https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-format-tap-stream
+	curl -Lso $(BIN)/bats-preprocess https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats-preprocess
+	curl -Lso $(BATS) https://raw.githubusercontent.com/sstephenson/bats/master/libexec/bats
+	chmod 755 $(BIN)/bats*
+
+
+
+# target: check-tools-bash   - Check versions of Bash tools.
+.PHONY: check-tools-bash
+check-tools-bash:
+	@$(call HELPTEXT,$@)
+	which $(SHELLCHECK) && $(SHELLCHECK) --version
+	which $(BATS) && $(BATS) --version
+
+
+
+# target: shellcheck         - Run shellcheck for bash files.
+.PHONY: shellcheck
+shellcheck:
+	@$(call HELPTEXT,$@)
+	[ ! -f src/*.bash ] || $(SHELLCHECK) --shell=bash src/*.bash
+
+
+
+# target: bats               - Run bats for unit testing bash files.
+.PHONY: bats
+bats:
+	@$(call HELPTEXT,$@)
+	[ ! -d bats ] || $(BATS) bats/
+
+
+
+# ------------------------------------------------------------------------
+#
+# Theme
+#
+# target: theme              - Do make build install in theme/ if available.
 .PHONY: theme
 theme:
 	@$(call HELPTEXT,$@)
 	[ ! -d theme ] || $(MAKE) --directory=theme build install
+	#[ ! -d theme ] || ( cd theme && make build install )
+
+
+
+# ------------------------------------------------------------------------
+#
+# Cimage
+#
+
+define CIMAGE_CONFIG
+<?php
+return [
+    "mode"         => "development",
+    "image_path"   =>  __DIR__ . "/../img/",
+    "cache_path"   =>  __DIR__ . "/../../cache/cimage/",
+    "autoloader"   =>  __DIR__ . "/../../vendor/autoload.php",
+];
+endef
+export CIMAGE_CONFIG
+
+# target: cimage-update           - Install/update Cimage to latest version.
+.PHONY: cimage-update
+cimage-update:
+	@$(call HELPTEXT,$@)
+	composer require mos/cimage
+	install -d htdocs/cimage cache/cimage
+	chmod 777 cache/cimage
+	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
+	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
+	touch htdocs/cimage/img_config.php
+
+# target: cimage-config-create    - Create configfile for Cimage.
+.PHONY: cimage-config-create
+cimage-config-create:
+	@$(call HELPTEXT,$@)
+	$(ECHO) "$$CIMAGE_CONFIG" | bash -c 'cat > htdocs/cimage/img_config.php'
+	cat htdocs/cimage/img_config.php
