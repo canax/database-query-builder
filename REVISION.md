@@ -4,7 +4,7 @@ Revision history
 v1.0.8 (2017-05-31)
 ---------------------------------
 
-* Bug: when throwing statement exception on pdd failure.
+* Bug: when throwing statement exception on pdo failure.
 
 
 v1.0.7 (2017-05-31)
