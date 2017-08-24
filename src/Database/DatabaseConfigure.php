@@ -2,22 +2,32 @@
 
 namespace Anax\Database;
 
+use \Anax\Common\ConfigureInterface;
+use \Anax\Common\ConfigureTrait;
+
 /**
  * Namespaced exception.
  */
-class DatabaseConfigure extends Database implements \Anax\Common\ConfigureInterface
+class DatabaseConfigure extends Database implements ConfigureInterface
 {
-    use \Anax\Common\ConfigureTrait;
+    use ConfigureTrait {
+        configure as protected loadConfiguration;
+    }
 
 
 
     /**
-     * Set options by using configuration.
+     * Load and apply configurations.
+     *
+     * @param array|string $what is an array with key/value config options
+     *                           or a file to be included which returns such
+     *                           an array.
      *
      * @return void
      */
-    public function setDefaultsFromConfiguration()
+    public function configure($what)
     {
+        $this->loadConfiguration($what);
         parent::setOptions($this->config);
     }
 }
