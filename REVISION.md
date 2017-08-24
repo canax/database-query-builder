@@ -1,6 +1,14 @@
 Revision history
 =================================
 
+v1.1.0* (2017-08-24)
+---------------------------------
+
+* Adding querybuilder.
+* Moving exception into Anax\Database\Exception.
+* Creating DatabaseConfigure::configure and removing setDefaultsFromConfiguration, breaking change.
+
+
 v1.0.8 (2017-05-31)
 ---------------------------------
 
