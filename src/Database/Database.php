@@ -2,6 +2,8 @@
 
 namespace Anax\Database;
 
+use \Anax\Database\Exception\Exception;
+
 /**
  * Database wrapper, provides a database API on top of PHP PDO for
  * enhancing the API and dealing with error reporting and tracking.
@@ -13,7 +15,7 @@ class Database
      * @var PDO          $pdo     the PDO object
      * @var PDOStatement $stmt    the latest PDOStatement used
      */
-    private $options;
+    protected $options;
     private $pdo = null;
     private $stmt = null;
 
@@ -57,7 +59,8 @@ class Database
 
 
     /**
-     * Connect to the database.
+     * Connect to the database, allow being called multiple times
+     * but ignore when connection is already made.
      *
      * @return self
      *
@@ -65,6 +68,10 @@ class Database
      */
     public function connect()
     {
+        if ($this->pdo) {
+            return $this;
+        }
+
         if (!isset($this->options['dsn'])) {
             throw new Exception("You can not connect, missing dsn.");
         }
@@ -245,6 +252,21 @@ class Database
 
 
     /**
+     * Fetch full resultset as new objects from this class.
+     *
+     * @param object $class which type of object to instantiate.
+     *
+     * @return array with resultset.
+     */
+    public function fetchAllClass($class)
+    {
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+        return $this->stmt->fetchAll();
+    }
+
+
+
+    /**
      * Fetch one resultset into an object.
      *
      * @param object $object to insert values into.
@@ -265,7 +287,7 @@ class Database
      * @param string $query  the SQL statement
      * @param array  $params the params array
      *
-     * @return boolean returns TRUE on success or FALSE on failure.
+     * @return self
      *
      * @throws Exception when failing to prepare question.
      */
@@ -283,7 +305,7 @@ class Database
             $this->statementException($query, $params);
         }
 
-        return $res;
+        return $this;
     }
 
 

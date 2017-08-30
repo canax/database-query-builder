@@ -5,11 +5,16 @@ namespace Anax\Database;
 /**
 * A testclass
 */
-class DatabaseSQLiteTest extends \PHPUnit_Framework_TestCase
+class DatabaseMySQLTest extends \PHPUnit_Framework_TestCase
 {
-    private $sqliteOptions = [
-        "dsn" => "sqlite:memory::",
-        "verbose" => false
+    private $mysqlOptions = [
+        // Set up details on how to connect to the database
+        'dsn'     => "mysql:host=localhost;dbname=test;",
+        'username'        => "test",
+        'password'        => "test",
+        'driver_options'  => [\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"],
+        'table_prefix'    => "",
+        'verbose' => true,
     ];
 
 
@@ -41,18 +46,6 @@ class DatabaseSQLiteTest extends \PHPUnit_Framework_TestCase
     /**
      * Testcase
      */
-    public function testAllowMultipleCallToConnect()
-    {
-        $db = $this->db->connect();
-        $db = $this->db->connect();
-        $this->assertInstanceOf("\Anax\Database\Database", $db);
-    }
-
-
-
-    /**
-     * Testcase
-     */
     public function testCreateObject()
     {
         $db = new Database();
@@ -64,7 +57,7 @@ class DatabaseSQLiteTest extends \PHPUnit_Framework_TestCase
     /**
      * Testcase
      *
-     * @expectedException \Anax\Database\Exception\Exception
+     * @expectedException \Anax\Database\Exception
      */
     public function testConnectGetException()
     {
