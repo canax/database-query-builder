@@ -86,9 +86,6 @@ class DatabaseQueryBuilder extends Database implements ConfigureInterface
             $query = $this->getSQL();
         }
 
-        var_dump($query);
-        var_dump($params);
-
         return parent::execute($query, $params);
     }
 }

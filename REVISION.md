@@ -1,9 +1,11 @@
 Revision history
 =================================
 
-v1.1.0* (2017-08-24)
+v1.1.0 (2017-09-05)
 ---------------------------------
 
+* Adding Active Record implementation.
+* Prepare to work as databasedriven models.
 * Adding querybuilder.
 * Moving exception into Anax\Database\Exception.
 * Creating DatabaseConfigure::configure and removing setDefaultsFromConfiguration, breaking change.

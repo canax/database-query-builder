@@ -19,18 +19,20 @@ trait QueryBuilderTrait
     private $prefix;
 
     /**
-     * @var $columns columns to select
+     * @var $start   first line of the sql query
      * @var $from    from part
      * @var $join    join part
+     * @var $set     set part for a update
      * @var $where   where part
      * @var $groupby group part
      * @var $orderby order part
      * @var $limit   limit part
      * @var $offset  offset part
      */
-    private $columns;
+    private $start;
     private $from;
     private $join;
+    private $set;
     private $where;
     private $groupby;
     private $orderby;
@@ -61,10 +63,10 @@ trait QueryBuilderTrait
      */
     protected function build()
     {
-        $sql = "SELECT\n\t"
-            . $this->columns . "\n"
+        $sql = $this->start . "\n"
             . $this->from . "\n"
             . ($this->join    ? $this->join           : null)
+            . ($this->set     ? $this->set            : null)
             . ($this->where   ? $this->where . "\n"   : null)
             . ($this->groupby ? $this->groupby . "\n" : null)
             . ($this->orderby ? $this->orderby . "\n" : null)
@@ -85,9 +87,10 @@ trait QueryBuilderTrait
     protected function clear()
     {
         $this->sql      = null;
-        $this->columns  = null;
+        $this->start    = null;
         $this->from     = null;
         $this->join     = null;
+        $this->set     = null;
         $this->where    = null;
         $this->groupby  = null;
         $this->orderby  = null;
@@ -261,14 +264,15 @@ trait QueryBuilderTrait
      * @param string $table   the table name.
      * @param array  $columns to update or key=>value with columns and values.
      * @param array  $values  to update or empty if $columns has bot columns and values.
-     * @param array  $where   limit which rows are updated.
      *
      * @throws \Anax\Database\BuildException
      *
      * @return void
      */
-    public function update($table, $columns, $values = null, $where = null)
+    public function update($table, $columns, $values = null)
     {
+        $this->clear();
+
         // If $values is string, then move that to $where
         if (is_string($values)) {
             $where = $values;
@@ -300,14 +304,12 @@ trait QueryBuilderTrait
 
         $cols = substr($cols, 0, -2);
 
-        $this->sql = "UPDATE "
+        $this->start = "UPDATE "
             . $this->prefix
-            . $table
-            . "\nSET\n"
-            . $cols
-            . "\nWHERE "
-            . $where
-            . "\n;\n";
+            . $table;
+        $this->set = "\nSET\n$cols";
+
+        return $this;
     }
 
 
@@ -318,19 +320,19 @@ trait QueryBuilderTrait
      * @param string $table the table name.
      * @param array  $where limit which rows are updated.
      *
-     * @return void
+     * @return self
      */
     public function deleteFrom($table, $where = null)
     {
+        $this->clear();
+
         if (isset($where)) {
-            $where = " WHERE " . $where;
+            $this->where = " WHERE " . $where;
         }
 
-        $this->sql = "DELETE FROM "
-            . $this->prefix
-            . $table
-            . $where
-            . ";\n";
+        $this->start = "DELETE ";
+        $this->from($table);
+        return $this;
     }
 
 
@@ -345,8 +347,7 @@ trait QueryBuilderTrait
     public function select($columns = '*')
     {
         $this->clear();
-        $this->columns = $columns;
-
+        $this->start = "SELECT\n\t$columns\n";
         return $this;
     }
 

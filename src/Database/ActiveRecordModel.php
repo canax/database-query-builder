@@ -3,6 +3,7 @@
 namespace Anax\Database;
 
 use \Anax\Database\DatabaseQueryBuilder;
+use \Anax\Database\Exception\ActiveRecordException;
 
 /**
  * An implementation of the Active Record pattern to be used as
@@ -11,20 +12,44 @@ use \Anax\Database\DatabaseQueryBuilder;
 class ActiveRecordModel
 {
     /**
-     * @var string TABLE_NAME name of the database table.
+     * @var DatabaseQueryBuilder $db the object for persistent
+     *                               storage.
+     */
+    protected $db = null;
+
+    /**
+     * @var string $tableName name of the database table.
      */
     protected $tableName = null;
 
 
 
     /**
-     * Constructor.
+     * Set the database object to use for accessing storage.
      *
      * @param DatabaseQueryBuilder $db as database access object.
+     *
+     * @return void
      */
-    public function __construct(DatabaseQueryBuilder $db)
+    public function setDb(DatabaseQueryBuilder $db)
     {
         $this->db = $db;
+    }
+
+
+
+    /**
+     * Check if database is injected or throw an exception.
+     *
+     * @throws ActiveRecordException when database is not set.
+     *
+     * @return void
+     */
+    protected function checkDb()
+    {
+        if (!$this->db) {
+            throw new ActiveRecordException("Missing \$db, did you forget to inject/set is?");
+        }
     }
 
 
@@ -46,24 +71,6 @@ class ActiveRecordModel
 
 
     /**
-     * Set object properties.
-     *
-     * @param array $properties with properties to set.
-     *
-     * @return void
-     */
-    // private function setProperties($properties)
-    // {
-    //     if (!empty($properties)) {
-    //         foreach ($properties as $key => $val) {
-    //             $this->$key = $val;
-    //         }
-    //     }
-    // }
-
-
-
-    /**
      * Find and return first object found by search criteria and use
      * its data to populate this instance.
      *
@@ -74,6 +81,7 @@ class ActiveRecordModel
      */
     public function find($column, $value)
     {
+        $this->checkDb();
         return $this->db->connect()
                         ->select()
                         ->from($this->tableName)
@@ -91,12 +99,12 @@ class ActiveRecordModel
      */
     public function findAll()
     {
-        $db = $this->db;
-        return $db->connect()
-                  ->select()
-                  ->from($this->tableName)
-                  ->execute()
-                  ->fetchAllClass(__CLASS__);
+        $this->checkDb();
+        return $this->db->connect()
+                        ->select()
+                        ->from($this->tableName)
+                        ->execute()
+                        ->fetchAllClass(get_class($this));
     }
 
 
@@ -125,15 +133,15 @@ class ActiveRecordModel
      */
     private function create()
     {
-        $db = $this->db;
+        $this->checkDb();
         $properties = $this->getProperties();
         unset($properties['id']);
         $columns = array_keys($properties);
         $values  = array_values($properties);
 
-        $db->connect()
-           ->insert($this->tableName, $columns)
-           ->execute($values);
+        $this->db->connect()
+                 ->insert($this->tableName, $columns)
+                 ->execute($values);
 
         $this->id = $this->db->lastInsertId();
     }
@@ -143,23 +151,21 @@ class ActiveRecordModel
     /**
      * Update row.
      *
-     * @param array $values key/values to save.
-     *
      * @return void
      */
-    private function update($values)
+    private function update()
     {
-        $db = $this->db;
+        $this->checkDb();
         $properties = $this->getProperties();
         unset($properties['id']);
         $columns = array_keys($properties);
         $values  = array_values($properties);
         $values[] = $this->id;
 
-        $db->connect()
-           ->update($this->tableName, $columns)
-           ->where("id = ?")
-           ->execute($values);
+        $this->db->connect()
+                 ->update($this->tableName, $columns)
+                 ->where("id = ?")
+                 ->execute($values);
     }
 
 
@@ -173,13 +179,13 @@ class ActiveRecordModel
      */
     public function delete($id = null)
     {
-        $db = $this->db;
+        $this->checkDb();
         $id = $id ?: $this->id;
 
-        $db->connect()
-           ->deleteFrom(self::CLASS_NAME)
-           ->where("id = ?")
-           ->execute([$id]);
+        $this->db->connect()
+                 ->deleteFrom($this->tableName)
+                 ->where("id = ?")
+                 ->execute([$id]);
 
         $this->id = null;
     }
