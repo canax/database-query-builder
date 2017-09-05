@@ -79,6 +79,6 @@ class DatabaseQueryBuilderSQLiteTest extends \PHPUnit_Framework_TestCase
 
         $res = $obj->password;
         $exp = "pwd";
-        $this->assertEquals($res, $exp);
+        $this->assertEquals($exp, $res);
     }
 }

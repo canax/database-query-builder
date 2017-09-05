@@ -66,7 +66,7 @@ EOD;
 SELECT
 \t*
 FROM mos_test
-WHERE \n\t(id = 1)
+WHERE\n\t(id = 1)
 \tAND (name = mumin)
 ;
 EOD;
@@ -107,13 +107,13 @@ EOD;
      */
     public function testDelete()
     {
-        $this->query->delete('test');
+        $this->query->deleteFrom('test');
 
         $res = $this->query->getSQL();
 
-        $exp = "DELETE FROM mos_test;\n";
+        $exp = "DELETE\nFROM mos_test\n;";
 
-        $this->assertEquals($res, $exp);
+        $this->assertEquals($exp, $res);
     }
 
 
@@ -123,13 +123,13 @@ EOD;
      */
     public function testDeleteWhere()
     {
-        $this->query->delete('test', "id = 2");
+        $this->query->deleteFrom('test', "id = 2");
 
         $res = $this->query->getSQL();
 
-        $exp = "DELETE FROM mos_test WHERE id = 2;\n";
+        $exp = "DELETE\nFROM mos_test\nWHERE\n\t(id = 2)\n;";
 
-        $this->assertEquals($res, $exp);
+        $this->assertEquals($exp, $res);
     }
 
 
@@ -297,9 +297,8 @@ EOD;
         $this->query->update(
             'test',
             ['age', 'text', 'text1'],
-            [22, "Mumintrollet", "asd"],
-            "id = ?"
-        );
+            [22, "Mumintrollet", "asd"]
+        )->where("id = ?");
 
         $res = $this->query->getSQL();
 
@@ -309,11 +308,11 @@ SET
 \tage = 22,
 \ttext = 'Mumintrollet',
 \ttext1 = 'asd'
-WHERE id = ?
+WHERE
+\t(id = ?)
 ;
-
 EOD;
-        $this->assertEquals($res, $exp);
+        $this->assertEquals($exp, $res);
     }
 
 

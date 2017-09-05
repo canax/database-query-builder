@@ -64,9 +64,9 @@ trait QueryBuilderTrait
     protected function build()
     {
         $sql = $this->start . "\n"
-            . $this->from . "\n"
+            . ($this->from    ? $this->from . "\n"    : null)
             . ($this->join    ? $this->join           : null)
-            . ($this->set     ? $this->set            : null)
+            . ($this->set     ? $this->set . "\n"     : null)
             . ($this->where   ? $this->where . "\n"   : null)
             . ($this->groupby ? $this->groupby . "\n" : null)
             . ($this->orderby ? $this->orderby . "\n" : null)
@@ -90,7 +90,7 @@ trait QueryBuilderTrait
         $this->start    = null;
         $this->from     = null;
         $this->join     = null;
-        $this->set     = null;
+        $this->set      = null;
         $this->where    = null;
         $this->groupby  = null;
         $this->orderby  = null;
@@ -272,13 +272,6 @@ trait QueryBuilderTrait
     public function update($table, $columns, $values = null)
     {
         $this->clear();
-
-        // If $values is string, then move that to $where
-        if (is_string($values)) {
-            $where = $values;
-            $values = null;
-        }
-
         list($columns, $values) = $this->mapColumnsWithValues($columns, $values);
 
         if (count($columns) != count($values)) {
@@ -307,7 +300,7 @@ trait QueryBuilderTrait
         $this->start = "UPDATE "
             . $this->prefix
             . $table;
-        $this->set = "\nSET\n$cols";
+        $this->set = "SET\n$cols";
 
         return $this;
     }
@@ -327,10 +320,10 @@ trait QueryBuilderTrait
         $this->clear();
 
         if (isset($where)) {
-            $this->where = " WHERE " . $where;
+            $this->where = "WHERE\n\t(" . $where . ")";
         }
 
-        $this->start = "DELETE ";
+        $this->start = "DELETE";
         $this->from($table);
         return $this;
     }
@@ -347,7 +340,7 @@ trait QueryBuilderTrait
     public function select($columns = '*')
     {
         $this->clear();
-        $this->start = "SELECT\n\t$columns\n";
+        $this->start = "SELECT\n\t$columns";
         return $this;
     }
 
@@ -363,7 +356,6 @@ trait QueryBuilderTrait
     public function from($table)
     {
         $this->from = "FROM " . $this->prefix . $table;
-
         return $this;
     }
 
@@ -450,7 +442,7 @@ trait QueryBuilderTrait
      */
     public function where($condition)
     {
-        $this->where = "WHERE \n\t(" . $condition . ")";
+        $this->where = "WHERE\n\t(" . $condition . ")";
 
         return $this;
     }
