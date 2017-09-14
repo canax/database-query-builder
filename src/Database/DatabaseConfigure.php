@@ -23,11 +23,12 @@ class DatabaseConfigure extends Database implements ConfigureInterface
      *                           or a file to be included which returns such
      *                           an array.
      *
-     * @return void
+     * @return self
      */
     public function configure($what)
     {
         $this->loadConfiguration($what);
         parent::setOptions($this->config);
+        return $this;
     }
 }
