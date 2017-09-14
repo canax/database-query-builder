@@ -23,11 +23,14 @@ class DatabaseQueryBuilder extends Database implements ConfigureInterface
      * Constructor creating a PDO object connecting to a choosen database.
      *
      * @param array $options containing details for connecting to the database.
+     *
+     * @return self
      */
     public function __construct($options = [])
     {
         parent::__construct($options);
         $this->setDefaultsFromConfiguration();
+        return $this;
     }
 
 
