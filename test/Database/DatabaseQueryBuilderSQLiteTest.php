@@ -29,6 +29,17 @@ class DatabaseQueryBuilderSQLiteTest extends \PHPUnit_Framework_TestCase
     /**
      * Test
      */
+    public function testConfigure()
+    {
+        $obj = self::$db->configure([]);
+        $this->assertEquals($obj, self::$db);
+    }
+
+
+
+    /**
+     * Test
+     */
     public function testCreateTable()
     {
         self::$db->createTable(
