@@ -1,6 +1,12 @@
 Revision history
 =================================
 
+v1.1.4 (2017-09-25)
+---------------------------------
+
+* Make all private methods protected in ActiveRecordModel to enable subclassing.
+
+
 v1.1.3 (2017-09-18)
 ---------------------------------
 

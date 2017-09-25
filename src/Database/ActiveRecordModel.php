@@ -59,7 +59,7 @@ class ActiveRecordModel
      *
      * @return array with object properties.
      */
-    private function getProperties()
+    protected function getProperties()
     {
         $properties = get_object_vars($this);
         unset($properties['tableName']);
@@ -131,7 +131,7 @@ class ActiveRecordModel
      *
      * @return void
      */
-    private function create()
+    protected function create()
     {
         $this->checkDb();
         $properties = $this->getProperties();
@@ -153,7 +153,7 @@ class ActiveRecordModel
      *
      * @return void
      */
-    private function update()
+    protected function update()
     {
         $this->checkDb();
         $properties = $this->getProperties();
