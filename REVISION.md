@@ -1,6 +1,16 @@
 Revision history
 =================================
 
+
+v1.1.5 (2017-10-09)
+---------------------------------
+
+* Add unit test to ActiveRecordModel.
+* Add Database::setOption() to enable set specific option to individual question.
+* Database::execute now prints details when option is verbose.
+* Add ActiveRecordModel::findAllWhere().
+
+
 v1.1.4 (2017-09-25)
 ---------------------------------
 

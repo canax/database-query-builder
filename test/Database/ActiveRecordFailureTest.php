@@ -7,7 +7,7 @@ namespace Anax\Database;
 */
 class ActiveRecordFailureTest extends \PHPUnit_Framework_TestCase
 {
-    static $db;
+    public static $db;
 
 
 
@@ -22,8 +22,8 @@ class ActiveRecordFailureTest extends \PHPUnit_Framework_TestCase
             "debug_connect" => true,
         ]);
 
-        self::$db->connect()
-                 ->createTable(
+        self::$db->connect();
+        self::$db->createTable(
             "User",
             [
                 "id" => ["integer", "primary key", "not null"],

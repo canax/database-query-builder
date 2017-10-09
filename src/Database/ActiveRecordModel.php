@@ -95,7 +95,7 @@ class ActiveRecordModel
     /**
      * Find and return all.
      *
-     * @return array
+     * @return array of object of this class
      */
     public function findAll()
     {
@@ -104,6 +104,29 @@ class ActiveRecordModel
                         ->select()
                         ->from($this->tableName)
                         ->execute()
+                        ->fetchAllClass(get_class($this));
+    }
+
+
+
+    /**
+     * Find and return all matching a search criteria of
+     * for example `id = ?` or `id IN [?, ?]`.
+     *
+     * @param string $where to use in where statement.
+     * @param mixed  $value to use in where statement.
+     *
+     * @return array of object of this class
+     */
+    public function findAllWhere($where, $value)
+    {
+        $this->checkDb();
+        $params = is_array($value) ? $value : [$value];
+        return $this->db->connect()
+                        ->select()
+                        ->from($this->tableName)
+                        ->where($where)
+                        ->execute($params)
                         ->fetchAllClass(get_class($this));
     }
 
