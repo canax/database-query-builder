@@ -59,6 +59,22 @@ class Database
 
 
     /**
+     * Set a single option.
+     *
+     * @param string $option which to set.
+     * @param mixed  $value  to set.
+     *
+     * @return self
+     */
+    public function setOption($option, $value)
+    {
+        $this->options[$option] = $value;
+        return $this;
+    }
+
+
+
+    /**
      * Connect to the database, allow being called multiple times
      * but ignore when connection is already made.
      *
@@ -298,6 +314,11 @@ class Database
         $this->stmt = $this->pdo->prepare($query);
         if (!$this->stmt) {
             $this->pdoException($query, $params);
+        }
+
+        if ($this->options["verbose"]) {
+            echo $query . "\n";
+            print_r($params);
         }
 
         $res = $this->stmt->execute($params);
