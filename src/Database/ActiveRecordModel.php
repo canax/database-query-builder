@@ -125,7 +125,7 @@ class ActiveRecordModel
         return $this->db->connect()
                         ->select()
                         ->from($this->tableName)
-                        ->where($where)
+                        ->where("$where = ?")
                         ->execute($params)
                         ->fetchAllClass(get_class($this));
     }
