@@ -125,7 +125,7 @@ class ActiveRecordModel
         return $this->db->connect()
                         ->select()
                         ->from($this->tableName)
-                        ->where("$where = ?")
+                        ->where($where)
                         ->execute($params)
                         ->fetchAllClass(get_class($this));
     }
@@ -145,6 +145,21 @@ class ActiveRecordModel
         }
 
         return $this->create();
+    }
+
+
+
+    /**
+     * Save current object/row, update with where.
+     *
+     * @param string $where to use in where statement.
+     * @param mixed  $params to use in where statement.
+     *
+     * @return void
+     */
+    public function saveWhere($where, $param)
+    {
+        return $this->updateWhere($where, $param);
     }
 
 
@@ -194,6 +209,33 @@ class ActiveRecordModel
 
 
     /**
+     * Update row where.
+     *
+     * @param string $where to use in where statement.
+     * @param mixed  $value to use in where statement.
+     *
+     * @return void
+     */
+    protected function updateWhere($where, $param)
+    {
+        $this->checkDb();
+        $properties = $this->getProperties();
+        $columns = array_keys($properties);
+        $values  = array_values($properties);
+
+        $params = is_array($param) ? $param : [$param];
+
+        $what = array_merge($values, $params);
+
+        $this->db->connect()
+                 ->update($this->tableName, $columns)
+                 ->where($where)
+                 ->execute($what);
+    }
+
+
+
+    /**
      * Delete row.
      *
      * @param integer $id to delete or use $this->id as default.
@@ -209,6 +251,29 @@ class ActiveRecordModel
                  ->deleteFrom($this->tableName)
                  ->where("id = ?")
                  ->execute([$id]);
+
+        $this->id = null;
+    }
+
+
+
+    /**
+     * Delete row where.
+     *
+     * @param string $where to use in where statement.
+     * @param mixed  $value to use in where statement.
+     *
+     * @return void
+     */
+    public function deleteWhere($where, $value)
+    {
+        $this->checkDb();
+        $params = is_array($value) ? $value : [$value];
+
+        $this->db->connect()
+                 ->deleteFrom($this->tableName)
+                 ->where($where)
+                 ->execute($params);
 
         $this->id = null;
     }
