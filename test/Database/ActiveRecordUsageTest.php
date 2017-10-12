@@ -52,6 +52,7 @@ class ActiveRecordUsageTest extends \PHPUnit_Framework_TestCase
         $user2->password = "pass2";
         $user2->save();
 
+        // find()
         $user3 = new User();
         $user3->setDb(self::$db);
         $user3->find("acronym", "user1");
@@ -61,6 +62,28 @@ class ActiveRecordUsageTest extends \PHPUnit_Framework_TestCase
         $user4->setDb(self::$db);
         $user4->find("acronym", "user2");
         $this->assertEquals($user2, $user4);
+
+        // findById()
+        $user5 = new User();
+        $user5->setDb(self::$db);
+        $user5->findById(1);
+        $this->assertEquals($user1, $user5);
+
+        $user6 = new User();
+        $user6->setDb(self::$db);
+        $user6->findById(2);
+        $this->assertEquals($user2, $user6);
+
+        // findWhere()
+        $user7 = new User();
+        $user7->setDb(self::$db);
+        $user7->findWhere("id = ? AND acronym = ?", [1, "user1"]);
+        $this->assertEquals($user1, $user7);
+
+        $user8 = new User();
+        $user8->setDb(self::$db);
+        $user8->findWhere("id = ? AND acronym = ?", [2, "user2"]);
+        $this->assertEquals($user2, $user8);
     }
 
 
@@ -82,6 +105,7 @@ class ActiveRecordUsageTest extends \PHPUnit_Framework_TestCase
         $user12->password = "pass12";
         $user12->save();
 
+        // findAll
         $user = new User();
         $user->setDb(self::$db);
         $users = $user->findAll();

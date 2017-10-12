@@ -22,6 +22,11 @@ class ActiveRecordModel
      */
     protected $tableName = null;
 
+    /**
+     * @var string $idColumn name of the id column in the database table.
+     */
+    protected $idColumn = "id";
+
 
 
     /**
@@ -62,9 +67,12 @@ class ActiveRecordModel
     protected function getProperties()
     {
         $properties = get_object_vars($this);
-        unset($properties['tableName']);
-        unset($properties['db']);
-        unset($properties['di']);
+        unset(
+            $properties['tableName'],
+            $properties['db'],
+            $properties['di'],
+            $properties['idColumn']
+        );
         return $properties;
     }
 
@@ -81,12 +89,51 @@ class ActiveRecordModel
      */
     public function find($column, $value)
     {
+        return $this->findWhere("$column = ?", $value);
+    }
+
+
+
+    /**
+     * Find and return first object by its idColumn and use
+     * its data to populate this instance.
+     *
+     * @param string $column to use in where statement.
+     * @param mixed  $value  to use in where statement.
+     *
+     * @return this
+     */
+    public function findById($value)
+    {
+        return $this->findWhere("{$this->idColumn} = ?", $value);
+    }
+
+
+
+    /**
+     * Find and return first object found by search criteria and use
+     * its data to populate this instance.
+     *
+     * The search criteria `$where` of can be set up like this:
+     *  `id = ?`
+     *  `id1 = ? and id2 = ?`
+     *
+     * The `$value` can be a single value or an array of values.
+     *
+     * @param string $where to use in where statement.
+     * @param mixed  $value to use in where statement.
+     *
+     * @return this
+     */
+    public function findWhere($where, $value)
+    {
         $this->checkDb();
+        $params = is_array($value) ? $value : [$value];
         return $this->db->connect()
                         ->select()
                         ->from($this->tableName)
-                        ->where("$column = ?")
-                        ->execute([$value])
+                        ->where($where)
+                        ->execute($params)
                         ->fetchInto($this);
     }
 
