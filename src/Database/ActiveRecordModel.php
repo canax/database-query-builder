@@ -98,14 +98,15 @@ class ActiveRecordModel
      * Find and return first object by its tableIdColumn and use
      * its data to populate this instance.
      *
-     * @param string $column to use in where statement.
-     * @param mixed  $value  to use in where statement.
+     * @param integer $id to find or use $this->{$this->tableIdColumn}
+     *                    as default.
      *
      * @return this
      */
-    public function findById($value)
+    public function findById($id = null)
     {
-        return $this->findWhere("{$this->tableIdColumn} = ?", $value);
+        $id = $id ?: $this->{$this->tableIdColumn};
+        return $this->findWhere("{$this->tableIdColumn} = ?", $id);
     }
 
 
@@ -202,16 +203,22 @@ class ActiveRecordModel
 
 
     /**
-     * Save current object/row, update with where.
+     * Save/update current object/row using a custom where-statement.
+     *
+     * The criteria `$where` of can be set up like this:
+     *  `id = ?`
+     *  `id1 = ? AND id2 = ?`
+     *
+     * The `$value` can be a single value or an array of values.
      *
      * @param string $where to use in where statement.
-     * @param mixed  $params to use in where statement.
+     * @param mixed  $value to use in where statement.
      *
      * @return void
      */
-    public function saveWhere($where, $param)
+    public function saveWhere($where, $value)
     {
-        return $this->updateWhere($where, $param);
+        return $this->updateWhere($where, $value);
     }
 
 
@@ -239,7 +246,7 @@ class ActiveRecordModel
 
 
     /**
-     * Update row.
+     * Update row using $tableIdColumn as where.
      *
      * @return void
      */
@@ -261,36 +268,45 @@ class ActiveRecordModel
 
 
     /**
-     * Update row where.
+     * Update row using a custom where-statement.
+     *
+     * The criteria `$where` of can be set up like this:
+     *  `id = ?`
+     *  `id1 = ? AND id2 = ?`
+     *  `id IN (?, ?)`
+     *
+     * The `$value` can be a single value or an array of values.
      *
      * @param string $where to use in where statement.
      * @param mixed  $value to use in where statement.
      *
      * @return void
      */
-    protected function updateWhere($where, $param)
+    protected function updateWhere($where, $value)
     {
         $this->checkDb();
         $properties = $this->getProperties();
         $columns = array_keys($properties);
         $values  = array_values($properties);
-
-        $params = is_array($param) ? $param : [$param];
-
-        $what = array_merge($values, $params);
+        $values1 = is_array($value)
+            ? $value
+            : [$value];
+        $values = array_merge($values, $values1);
 
         $this->db->connect()
                  ->update($this->tableName, $columns)
                  ->where($where)
-                 ->execute($what);
+                 ->execute($values);
     }
 
 
 
     /**
-     * Delete row.
+     * Update row using $tableIdColumn as where and clear value of
+     * `$tableIdColumn`.
      *
-     * @param integer $id to delete or use $this->{$this->tableIdColumn} as default.
+     * @param integer $id to delete or use $this->{$this->tableIdColumn}
+     *                    as default.
      *
      * @return void
      */
@@ -310,7 +326,15 @@ class ActiveRecordModel
 
 
     /**
-     * Delete row where.
+     * Delete row using a custom where-statement and leave value of
+     * `$tableIdColumn` as it is.
+     *
+     * The criteria `$where` of can be set up like this:
+     *  `id = ?`
+     *  `id1 = ? AND id2 = ?`
+     *  `id IN (?, ?)`
+     *
+     * The `$value` can be a single value or an array of values.
      *
      * @param string $where to use in where statement.
      * @param mixed  $value to use in where statement.
@@ -320,13 +344,11 @@ class ActiveRecordModel
     public function deleteWhere($where, $value)
     {
         $this->checkDb();
-        $params = is_array($value) ? $value : [$value];
+        $values = is_array($value) ? $value : [$value];
 
         $this->db->connect()
                  ->deleteFrom($this->tableName)
                  ->where($where)
-                 ->execute($params);
-
-        $this->id = null;
+                 ->execute($values);
     }
 }
