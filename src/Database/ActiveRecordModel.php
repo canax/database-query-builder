@@ -157,8 +157,13 @@ class ActiveRecordModel
 
 
     /**
-     * Find and return all matching a search criteria of
-     * for example `id = ?` or `id IN [?, ?]`.
+     * Find and return all matching the search criteria.
+     *
+     * The search criteria `$where` of can be set up like this:
+     *  `id = ?`
+     *  `id IN [?, ?]`
+     *
+     * The `$value` can be a single value or an array of values.
      *
      * @param string $where to use in where statement.
      * @param mixed  $value to use in where statement.
