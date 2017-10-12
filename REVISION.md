@@ -5,6 +5,8 @@ Revision history
 v1.1.6 (2017-10-09)
 ---------------------------------
 
+* Add support for custom name of id field, fix #6.
+* Change dependecy from anax/common to anax/configure.
 * Add findWhere() and findbyId().
 
 

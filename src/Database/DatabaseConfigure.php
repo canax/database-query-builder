@@ -2,8 +2,8 @@
 
 namespace Anax\Database;
 
-use \Anax\Common\ConfigureInterface;
-use \Anax\Common\ConfigureTrait;
+use \Anax\Configure\ConfigureInterface;
+use \Anax\Configure\ConfigureTrait;
 
 /**
  * Namespaced exception.

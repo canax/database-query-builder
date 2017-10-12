@@ -25,9 +25,9 @@
         "php": ">=5.6"
     },
     "suggest": {
-        "anax/common": "To enhance integration with Anax framework."
+        "anax/configure": "To enhance integration with Anax framework."
     },
     "require-dev": {
-        "anax/common": "^1.0"
+        "anax/configure": "^1.0"
     }
 }
