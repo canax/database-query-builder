@@ -23,9 +23,9 @@ class ActiveRecordModel
     protected $tableName = null;
 
     /**
-     * @var string $idColumn name of the id column in the database table.
+     * @var string $tableIdColumn name of the id column in the database table.
      */
-    protected $idColumn = "id";
+    protected $tableIdColumn = "id";
 
 
 
@@ -71,7 +71,7 @@ class ActiveRecordModel
             $properties['tableName'],
             $properties['db'],
             $properties['di'],
-            $properties['idColumn']
+            $properties['tableIdColumn']
         );
         return $properties;
     }
@@ -95,7 +95,7 @@ class ActiveRecordModel
 
 
     /**
-     * Find and return first object by its idColumn and use
+     * Find and return first object by its tableIdColumn and use
      * its data to populate this instance.
      *
      * @param string $column to use in where statement.
@@ -105,7 +105,7 @@ class ActiveRecordModel
      */
     public function findById($value)
     {
-        return $this->findWhere("{$this->idColumn} = ?", $value);
+        return $this->findWhere("{$this->tableIdColumn} = ?", $value);
     }
 
 
@@ -192,7 +192,7 @@ class ActiveRecordModel
      */
     public function save()
     {
-        if (isset($this->id)) {
+        if (isset($this->{$this->tableIdColumn})) {
             return $this->update();
         }
 
@@ -210,7 +210,7 @@ class ActiveRecordModel
     {
         $this->checkDb();
         $properties = $this->getProperties();
-        unset($properties['id']);
+        unset($properties[$this->tableIdColumn]);
         $columns = array_keys($properties);
         $values  = array_values($properties);
 
@@ -218,7 +218,7 @@ class ActiveRecordModel
                  ->insert($this->tableName, $columns)
                  ->execute($values);
 
-        $this->id = $this->db->lastInsertId();
+        $this->{$this->tableIdColumn} = $this->db->lastInsertId();
     }
 
 
@@ -232,14 +232,14 @@ class ActiveRecordModel
     {
         $this->checkDb();
         $properties = $this->getProperties();
-        unset($properties['id']);
+        unset($properties[$this->tableIdColumn]);
         $columns = array_keys($properties);
         $values  = array_values($properties);
-        $values[] = $this->id;
+        $values[] = $this->{$this->tableIdColumn};
 
         $this->db->connect()
                  ->update($this->tableName, $columns)
-                 ->where("id = ?")
+                 ->where("{$this->tableIdColumn} = ?")
                  ->execute($values);
     }
 
@@ -248,20 +248,20 @@ class ActiveRecordModel
     /**
      * Delete row.
      *
-     * @param integer $id to delete or use $this->id as default.
+     * @param integer $id to delete or use $this->{$this->tableIdColumn} as default.
      *
      * @return void
      */
     public function delete($id = null)
     {
         $this->checkDb();
-        $id = $id ?: $this->id;
+        $id = $id ?: $this->{$this->tableIdColumn};
 
         $this->db->connect()
                  ->deleteFrom($this->tableName)
-                 ->where("id = ?")
+                 ->where("{$this->tableIdColumn} = ?")
                  ->execute([$id]);
 
-        $this->id = null;
+        $this->{$this->tableIdColumn} = null;
     }
 }

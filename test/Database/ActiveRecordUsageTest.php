@@ -66,23 +66,23 @@ class ActiveRecordUsageTest extends \PHPUnit_Framework_TestCase
         // findById()
         $user5 = new User();
         $user5->setDb(self::$db);
-        $user5->findById(1);
+        $user5->findById($user1->id);
         $this->assertEquals($user1, $user5);
 
         $user6 = new User();
         $user6->setDb(self::$db);
-        $user6->findById(2);
+        $user6->findById($user2->id);
         $this->assertEquals($user2, $user6);
 
         // findWhere()
         $user7 = new User();
         $user7->setDb(self::$db);
-        $user7->findWhere("id = ? AND acronym = ?", [1, "user1"]);
+        $user7->findWhere("id = ? AND acronym = ?", [$user1->id, "user1"]);
         $this->assertEquals($user1, $user7);
 
         $user8 = new User();
         $user8->setDb(self::$db);
-        $user8->findWhere("id = ? AND acronym = ?", [2, "user2"]);
+        $user8->findWhere("id = ? AND acronym = ?", [$user2->id, "user2"]);
         $this->assertEquals($user2, $user8);
     }
 
@@ -166,5 +166,46 @@ class ActiveRecordUsageTest extends \PHPUnit_Framework_TestCase
         $res = $users[1]->acronym;
         $exp = $user2->acronym;
         $this->assertEquals($exp, $res);
+    }
+
+
+
+    /**
+     * Save, update and find objects.
+     */
+    public function testSaveUpdateFind()
+    {
+        $user1 = new User();
+        $user1->setDb(self::$db);
+        $user1->acronym = "";
+        $user1->password = "";
+        $user1->save();
+        $id1 = $user1->id;
+
+        $user1->acronym = "user31";
+        $user1->password = "pass31";
+        $user1->save();
+
+        $user2 = new User();
+        $user2->setDb(self::$db);
+        $user2->acronym = "";
+        $user2->password = "";
+        $user2->save();
+        $id2 = $user2->id;
+
+        $user2->acronym = "user32";
+        $user2->password = "pass32";
+        $user2->save();
+
+        // findById()
+        $user3 = new User();
+        $user3->setDb(self::$db);
+        $user3->findById($id1);
+        $this->assertEquals($user1, $user3);
+
+        $user4 = new User();
+        $user4->setDb(self::$db);
+        $user4->findById($id2);
+        $this->assertEquals($user2, $user4);
     }
 }

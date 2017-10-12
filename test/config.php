@@ -23,4 +23,5 @@ require ANAX_INSTALL_PATH . "/vendor/autoload.php";
 /**
  * Include others.
  */
+require __DIR__ . "/Book.php";
 require __DIR__ . "/User.php";
