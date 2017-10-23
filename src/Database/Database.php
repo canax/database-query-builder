@@ -25,6 +25,8 @@ class Database
      * Constructor creating a PDO object connecting to a choosen database.
      *
      * @param array $options containing details for connecting to the database.
+     *
+     * @return void
      */
     public function __construct($options = [])
     {
@@ -78,9 +80,9 @@ class Database
      * Connect to the database, allow being called multiple times
      * but ignore when connection is already made.
      *
-     * @return self
-     *
      * @throws \Anax\Database\Exception
+     *
+     * @return self
      */
     public function connect()
     {
@@ -159,7 +161,7 @@ class Database
      * @param string $query  the SQL statement
      * @param array  $params the params array
      *
-     * @return array with resultset
+     * @return mixed with resultset
      */
     public function executeFetchAll($query, $params = [])
     {
@@ -176,7 +178,7 @@ class Database
      * @param string $query  the SQL statement
      * @param array  $params the params array
      *
-     * @return array with resultset
+     * @return mixed with resultset
      */
     public function executeFetch($query, $params = [])
     {
@@ -194,7 +196,7 @@ class Database
      * @param array  $params the params array
      * @param string $class  the class to create an object of and insert into
      *
-     * @return array with resultset
+     * @return object with resultset
      */
     public function executeFetchClass($query, $params, $class)
     {
@@ -213,15 +215,15 @@ class Database
      * @param array  $params the params array
      * @param string $object the existing object to insert into
      *
-     * @return array with resultset
+     * @return object with resultset
      */
-    public function executeFetchInto($query, $param, $object = null)
+    public function executeFetchInto($query, $params, $object = null)
     {
-        if (!$object) {
-            $object = $param;
-            $param = [];
+        if (is_null($object)) {
+            $object = $params;
+            $params = [];
         }
-        $this->execute($query, $param);
+        $this->execute($query, $params);
         $this->stmt->setFetchMode(\PDO::FETCH_INTO, $object);
         return $this->stmt->fetch();
     }
@@ -243,7 +245,7 @@ class Database
     /**
      * Fetch one resultset.
      *
-     * @return array with resultset.
+     * @return mixed with resultset.
      */
     public function fetch()
     {
@@ -255,13 +257,13 @@ class Database
     /**
      * Fetch one resultset as a new object from this class.
      *
-     * @param object $class which type of object to instantiate.
+     * @param string $classname which type of object to instantiate.
      *
-     * @return array with resultset.
+     * @return object with resultset.
      */
-    public function fetchClass($class)
+    public function fetchClass($classname)
     {
-        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $classname);
         return $this->stmt->fetch();
     }
 
@@ -270,13 +272,13 @@ class Database
     /**
      * Fetch full resultset as new objects from this class.
      *
-     * @param object $class which type of object to instantiate.
+     * @param string $classname which type of object to instantiate.
      *
      * @return array with resultset.
      */
-    public function fetchAllClass($class)
+    public function fetchAllClass($classname)
     {
-        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $class);
+        $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $classname);
         return $this->stmt->fetchAll();
     }
 
@@ -303,9 +305,9 @@ class Database
      * @param string $query  the SQL statement
      * @param array  $params the params array
      *
-     * @return self
-     *
      * @throws Exception when failing to prepare question.
+     *
+     * @return self
      */
     public function execute($query, $params = [])
     {
@@ -367,9 +369,9 @@ class Database
      * @param string       $query   query to execute
      * @param array        $param   to match ? in statement
      *
-     * @return void
-     *
      * @throws \Anax\Database\Exception
+     *
+     * @return void
      */
     protected function pdoException($query, $param)
     {
@@ -384,9 +386,9 @@ class Database
      * @param string       $query   query to execute
      * @param array        $param   to match ? in statement
      *
-     * @return void
-     *
      * @throws \Anax\Database\Exception
+     *
+     * @return void
      */
     protected function statementException($query, $param)
     {
@@ -423,13 +425,13 @@ class Database
      * Fetch one resultset as an object from this class.
      * OBSOLETE replaced by fetchClass
      *
-     * @param object $class which type of object to instantiate.
+     * @param string $classname which type of object to instantiate.
      *
-     * @return array with resultset.
+     * @return object with resultset.
      */
-    public function fetchObject($class)
+    public function fetchObject($classname)
     {
-        return $this->stmt->fetchObject($class);
+        return $this->stmt->fetchObject($classname);
     }
 
 
@@ -437,7 +439,7 @@ class Database
     /**
      * Fetch one resultset. OBSOLETE replace by fetch()
      *
-     * @return array with resultset.
+     * @return mixed with resultset.
      */
     public function fetchOne()
     {
