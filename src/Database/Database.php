@@ -25,8 +25,6 @@ class Database
      * Constructor creating a PDO object connecting to a choosen database.
      *
      * @param array $options containing details for connecting to the database.
-     *
-     * @return void
      */
     public function __construct($options = [])
     {

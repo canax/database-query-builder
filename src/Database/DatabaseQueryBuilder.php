@@ -71,13 +71,14 @@ class DatabaseQueryBuilder extends Database implements ConfigureInterface
     /**
      * Execute a SQL-query and ignore the resultset.
      *
-     * @param string $query  the SQL statement
-     * @param array  $params the params array
+     * @param string|null|array $query  the SQL statement (or $params)
+     * @param array             $params the params array
      *
      * @return boolean returns TRUE on success or FALSE on failure.
      */
     public function execute($query = null, $params = [])
     {
+        // When using one argument and its array, assume its $params
         if (is_array($query)) {
             $params = $query;
             $query = null;
