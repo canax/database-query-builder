@@ -7,6 +7,7 @@ v1.2.0 (2018-04-24)
 
 * Added Codacy and Codeclimate badge.
 * Update README with documentation.
+* Adding service in config/di/db.php.
 
 
 
