@@ -303,13 +303,17 @@ class Database
      * @param string $query  the SQL statement
      * @param array  $params the params array
      *
-     * @throws Exception when failing to prepare question.
+     * @throws Exception when failing to prepare question or when not connected.
      *
      * @return self
      */
     public function execute($query, $params = [])
     {
         list($query, $params) = $this->expandParamArray($query, $params);
+
+        if (!$this->pdo) {
+            $this->createException("Did you forget to connect to the database?", $query, $params);
+        }
 
         $this->stmt = $this->pdo->prepare($query);
         if (!$this->stmt) {
