@@ -2,12 +2,14 @@ Revision history
 =================================
 
 
-v1.2.0 (2018-04-24)
+v1.1.10 (2018-04-25)
 ---------------------------------
 
 * Added Codacy and Codeclimate badge.
 * Update README with documentation.
 * Adding service in config/di/db.php.
+* Deprecated Active Record, the aim is to move that codebase to its own repo.
+* Deprecated SQL Query builder, the aim is to move that codebase to its own repo.
 
 
 
