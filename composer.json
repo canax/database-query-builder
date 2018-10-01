@@ -1,7 +1,7 @@
 {
-    "name": "anax/database",
+    "name": "anax/database-query-builder",
     "type": "library",
-    "description": "Anax Database module.",
+    "description": "Anax Database Query Builder module.",
     "keywords": ["boilerplate", "framework", "mvc", "micro", "education"],
     "homepage": "https://dbwebb.se/anax",
     "license": "MIT",
@@ -14,7 +14,7 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/canax/database/issues"
+        "issues": "https://github.com/canax/database-query-builder/issues"
     },
     "autoload": {
         "psr-4": { 
