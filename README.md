@@ -1,7 +1,7 @@
 Anax Database Query Builder
 ==================================
 
-[![Join the chat at https://gitter.im/canax/di](https://badges.gitter.im/canax/database-query-builder.svg)](https://gitter.im/canax/database-query-builder?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/canax/database-query-builder](https://badges.gitter.im/canax/database-query-builder.svg)](https://gitter.im/canax/database-query-builder?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Latest Stable Version](https://poser.pugx.org/anax/database-query-builder/v/stable)](https://packagist.org/packages/anax/database-query-builder)
 
 [![Build Status](https://travis-ci.org/canax/database-query-builder.svg?branch=master)](https://travis-ci.org/canax/database-query-builder)
