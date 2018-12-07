@@ -2,6 +2,15 @@ Revision history
 =================================
 
 
+v2.0.0-beta.1 (2018-12-07)
+---------------------------------
+
+* Split anax/database-query-builder and anax/database-active-record.
+* Changed namespace to Anax\\DatabaseQueryBuilder.
+* Made pass unit tests.
+
+
+
 v2.0.0-alpha.1 (2018-10-01)
 ---------------------------------
 

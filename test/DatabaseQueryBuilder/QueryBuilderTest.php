@@ -1,11 +1,13 @@
 <?php
 
-namespace Anax\Database;
+namespace Anax\DatabaseQueryBuilder;
+
+use PHPUnit\Framework\TestCase;
 
 /**
-* A testclass
-*/
-class QueryBuilderTest extends \PHPUnit_Framework_TestCase
+ * Test the query builder.
+ */
+class QueryBuilderTest extends TestCase
 {
     /**
      * Sets up the mock

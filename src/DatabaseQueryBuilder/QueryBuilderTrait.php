@@ -1,11 +1,11 @@
 <?php
 
-namespace Anax\Database;
+namespace Anax\DatabaseQueryBuilder;
 
-use \Anax\Database\Exception\BuildException;
+use Anax\DatabaseQueryBuilder\Exception\BuildException;
 
 /**
- * Build SQL queries by method calling.
+ * Trait to implement building SQL queries by method calling.
  */
 trait QueryBuilderTrait
 {
@@ -541,15 +541,11 @@ trait QueryBuilderTrait
     {
         // If $values is null, then use $columns to build it up
         if (is_null($values)) {
-
             if ($this->isAssoc($columns)) {
-
                 // Incoming is associative array, split it up in two
                 $values = array_values($columns);
                 $columns = array_keys($columns);
-
             } else {
-
                 // Create an array of '?' to match number of columns
                 $max = count($columns);
                 for ($i = 0; $i < $max; $i++) {

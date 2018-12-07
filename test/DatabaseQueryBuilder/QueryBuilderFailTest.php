@@ -1,11 +1,13 @@
 <?php
 
-namespace Anax\Database;
+namespace Anax\DatabaseQueryBuilder;
+
+use PHPUnit\Framework\TestCase;
 
 /**
-* A testclass
+* Negative tests for query builder.
 */
-class QueryBuilderFailureTest extends \PHPUnit_Framework_TestCase
+class QueryBuilderFailTest extends TestCase
 {
     /**
      * Sets up the mock
@@ -22,7 +24,7 @@ class QueryBuilderFailureTest extends \PHPUnit_Framework_TestCase
     /**
      * Test
      *
-     * @expectedException \Anax\Database\Exception\BuildException
+     * @expectedException \Anax\DatabaseQueryBuilder\Exception\BuildException
      */
     public function testInsertWrongData()
     {
@@ -38,7 +40,7 @@ class QueryBuilderFailureTest extends \PHPUnit_Framework_TestCase
     /**
      * Test
      *
-     * @expectedException \Anax\Database\Exception\BuildException
+     * @expectedException \Anax\DatabaseQueryBuilder\Exception\BuildException
      */
     public function testUpdateWrongData()
     {
