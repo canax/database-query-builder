@@ -12,7 +12,7 @@ Anax Database Query Builder
 [![Code Coverage](https://scrutinizer-ci.com/g/canax/database-query-builder/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/canax/database-query-builder/?branch=master)
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/ab0c4d472565d95e64ff/maintainability)](https://codeclimate.com/github/canax/database-query-builder/maintainability)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6dff6044d25646e9bcaea3a333108ded)](https://www.codacy.com/app/mosbth/database?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=canax/database-query-builder&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6dff6044d25646e9bcaea3a333108ded)](https://www.codacy.com/app/mosbth/database-query-builder?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=canax/database-query-builder&amp;utm_campaign=Badge_Grade)
 
 
 **Work not yet started to transform package to anax/database-query-builder**
