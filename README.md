@@ -31,7 +31,7 @@ Table of content
 * [Exceptions](#exceptions)
 * [DI service](#di-service)
 * [Access as framework service](#access-as-framework-service)
-
+* [Basic usage](#Basic-usage)
 * [Dependency](#Dependency)
 * [License](#License)
 
