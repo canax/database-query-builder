@@ -1,8 +1,8 @@
 Anax Database Query Builder
 ==================================
 
-[![Join the chat at https://gitter.im/canax/database-query-builder](https://badges.gitter.im/canax/database-query-builder.svg)](https://gitter.im/canax/database-query-builder?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Latest Stable Version](https://poser.pugx.org/anax/database-query-builder/v/stable)](https://packagist.org/packages/anax/database-query-builder)
+[![Join the chat at https://gitter.im/canax/database-query-builder](https://badges.gitter.im/canax/database-query-builder.svg)](https://gitter.im/canax/database-query-builder?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Build Status](https://travis-ci.org/canax/database-query-builder.svg?branch=master)](https://travis-ci.org/canax/database-query-builder)
 [![CircleCI](https://circleci.com/gh/canax/database-query-builder.svg?style=svg)](https://circleci.com/gh/canax/database-query-builder)
@@ -14,31 +14,56 @@ Anax Database Query Builder
 [![Maintainability](https://api.codeclimate.com/v1/badges/ab0c4d472565d95e64ff/maintainability)](https://codeclimate.com/github/canax/database-query-builder/maintainability)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6dff6044d25646e9bcaea3a333108ded)](https://www.codacy.com/app/mosbth/database-query-builder?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=canax/database-query-builder&amp;utm_campaign=Badge_Grade)
 
+Anax Database Query Builder module as an extension to [`anax/database`](https://github.com/canax/database) to enable querying the datase using methods instead of SQL.
 
-**Work not yet started to transform package to anax/database-query-builder**
-
-Anax Database module for wrapping PHP PDO with an additional layer of utilities, providing support for a SQL query builder and an Active Record implementation.
+This module is used to implement the module Database Active Record [`anax\database-active-record`](https://github.com/canax/database-active-record).
 
 The module is tested using MySQL and SQLite.
-
-Work is ongoing to move the SQL query builder and the Active Record part to their own repos. The aim is to make this module cleaner and only supporting the layer right above PHP PDO. Therefore is the neither of those documented here.
 
 
 
 Table of content
 ------------------
 
+* [Install](#Install)
+* [Development](#Development)
 * [Class, interface, trait](#class-interface-trait)
 * [Exceptions](#exceptions)
-* [Configuration file](#configuration-file)
 * [DI service](#di-service)
 * [Access as framework service](#access-as-framework-service)
-* [Create a connection](#create-a-connection)
-* [Perform a SELECT query](#perform-a-select-query)
-* [Perform an INSERT, UPDATE, DELETE query](#perform-an-insert-update-delete-query)
-* [Last insert id](#last-insert-id)
-* [Row count, affected rows](#row-count-affected-rows)
-* [Throw exception on failure](#throw-exception-on-failure)
+
+* [Dependency](#Dependency)
+* [License](#License)
+
+
+
+Install
+------------------
+
+You can install the module from [`anax/database-query-builder` on Packagist](https://packagist.org/packages/anax/database-query-builder) using composer.
+
+```text
+composer require anax/database-query-builder
+```
+
+You can then copy the default configuration files as a start.
+
+```text
+# In the root of your Anax installation
+rsync -av vendor/anax/database-query-builder/config .
+```
+
+
+
+Development
+------------------
+
+To work as a developer you clone the repo and install the local environment through make. Then you can run the unit tests.
+
+```text
+make install
+make test
+```
 
 
 
@@ -47,257 +72,169 @@ Class, interface, trait
 
 The following classes, interfaces and traits exists.
 
-These parts is the foundation for the database module, supporting extra utilities and additional error handling.
-
-| Class, interface, trait            | Description |
-|------------------------------------|-------------|
-| `Anax\Database\Database`           | Wrapper class for PHP PDO with enhanced error handling and extra utilities. |
-| `Anax\Database\DatabaseConfigure`  | An alternative class that can be configured from a Anax configuration file. |
-
-<!--
 The following parts are related to the feature of a SQL query builder.
 
 | Class, interface, trait            | Description |
 |------------------------------------|-------------|
-| `Anax\Database\QueryBuilderTrait`  | A trait implementing SQL query builder, to be used together with `Anax\Database\Database`. |
-| `Anax\Database\DatabaseQueryBuilder` | An alternate configurable database class using the SQL query builder trait. |
-
-The following parts are related to the feature of Active Record.
-
-| Class, interface, trait            | Description |
-|------------------------------------|-------------|
-| `Anax\Database\ActiveRecordModel`  | An Active Record implementation using the SQL query builder. |
--->
+| `Anax\Database\QueryBuilderTrait`  | A trait implementing SQL query builder, based upon `Anax\Database\Database`. |
+| `Anax\Database\DatabaseQueryBuilder` | A database class using the SQL query builder trait (used by the Active Record module) and extending the database class. |
 
 
 
 Exceptions
 ------------------
 
-All exceptions are in the namespace `Anax\Database\Exception\`. The following exceptions exists and may be thrown. 
+All exceptions are in the namespace `Anax\DatabaseQueryBuilder\Exception\`. The following exceptions exists and may be thrown. 
 
 | Exception               | Description |
 |-------------------------|-------------|
-| `Exception`             | General module specific exception, for example when connection fail. |
-
-<!--
-| `BuildException`        | Failing to build an SQL expression, related to the query builder. |
-| `ActiveRecordException` | Related to the active record implementation. |
--->
-
-
-
-Configuration file
-------------------
-
-This is a sample configuration file, it is usually stored in `config/database.php`.
-
-```php
-<?php
-/**
- * Config file for Database.
- *
- * Example for MySQL.
- *  "dsn" => "mysql:host=localhost;dbname=test;",
- *  "username" => "test",
- *  "password" => "test",
- *  "driver_options"  => [
- *      \PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'UTF8'"
- *  ],
- *
- * Example for SQLite.
- *  "dsn" => "sqlite:memory::",
- *
- */
-return [
-    "dsn"             => null,
-    "username"        => null,
-    "password"        => null,
-    "driver_options"  => null,
-    "fetch_mode"      => \PDO::FETCH_OBJ,
-    "table_prefix"    => null,
-    "session_key"     => "Anax\Database",
-
-    // True to be very verbose during development
-    "verbose"         => null,
-
-    // True to be verbose on connection failed
-    "debug_connect"   => false,
-];
-```
-
-You can use if-statements within the configuration file to serve different configurations for local development environment, staging and or production environment.
+| `BuildException`        | When failing to build a SQL query. |
 
 
 
 DI service
 ------------------
 
-The session is created as a framework service within `$di`. The following is a sample on how the session service is created through `config/di/db.php`.
+The database query builder is created as a framework service within `$di`. The following is a sample on how the database query builder service is created through `config/di/dbqb.php`.
 
 ```php
-<?php
 /**
- * Configuration file for database service.
+ * Configuration file for database query builder service.
  */
 return [
     // Services to add to the container.
     "services" => [
-        "db" => [
+        "dbqb" => [
             "shared" => true,
             "callback" => function () {
-                $obj = new \Anax\Database\DatabaseConfigure();
-                $obj->configure("database.php");
-                return $obj;
+                $obj = new \Anax\DatabaseQueryBuilder\DatabaseQueryBuilder();
+
+                // Load the configuration files
+                $cfg = $this->get("configuration");
+                $config = $cfg->load("database");
+
+                // Set the database configuration
+                $connection = $config["config"] ?? [];
+                $db->setOptions($connection);
+                $db->setDefaultsFromConfiguration();
+
+                return $db;
             }
         ],
     ],
 ];
 ```
 
-1. The object is created.
-1. The configuration file is read and applied.
-
-The service is lazy loaded and not created until it is used.
-
 
 
 Access as framework service
 ------------------
 
-You can access the module as a framework service.
+You can access the module as a framework service and use it as an ordinary database service.
 
 ```php
 $sql = "SELECT * FROM movie;";
 
-# $app style
-$app->db->connect();
-$res = $app->db->executeFetchAll($sql);
-
-# $di style
-$db = $di->get("db");
+$db = $di->get("dbqb");
 $db->connect();
 $res = $db->executeFetchAll($sql);
 ```
 
+This is since the class `\Anax\DatabaseQueryBuilder\DatabaseQueryBuilder` extends the database class `\Anax\Database\Database`.
 
 
-Create a connection
+
+Basic usage
 ------------------
 
-You must connect to the database before using it.
+This is the basic usage of the query builder.
 
-You may call `$db->connect()` many times, the connection is however only made once, the first time, so it is safe to call the method several times.
+You start by creating a database object from the query builder class and connect to the database.
 
 ```php
-# $app style
-$app->db->connect();
-
-# $di style
-$di->get("db")->connect();
+$this->db = new DatabaseQueryBuilder([
+    "dsn" => "sqlite::memory:",
+]);
+$this->db->setDefaultsFromConfiguration();
+$this->db->connect();
 ```
 
+This is more or less the same as retrieving the class from the $di container.
 
-
-Perform a SELECT query
-------------------
-
-You connect and perform the query which returns a resultset.
+You can now create a table.
 
 ```php
-$sql = "SELECT * FROM movie;";
-
-# $app style
-$app->db->connect();
-$res = $app->db->executeFetchAll($sql);
-
-# $di style
-$db = $di->get("db");
-$db->connect();
-$res = $db->executeFetchAll($sql);
+// Create a table
+$this->db->createTable(
+    'user',
+    [
+        'id'    => ['integer', 'primary key', 'not null'],
+        'age'   => ['integer'],
+        'name'  => ['varchar(10)']
+    ]
+)->execute();
 ```
 
-The contents of `$res` is depending on the configuration key which default is set to `"fetch_mode" => \PDO::FETCH_OBJ,`.
+The table is created.
 
-
-
-Perform an INSERT, UPDATE, DELETE query
-------------------
-
-These queries, that updates the database, uses `$db->execute()` and does not return a resultset.
+You can now insert rows into the table.
 
 ```php
-$sql = "UPDATE movie SET title = ? WHERE id = ?;";
+$this->db->insert(
+    "user",
+    [
+        "age" => 3,
+        "name" => "three",
+    ]
+)->execute();
 
-# $app style
-$app->db->connect();
-$app->db->execute($sql, ["Some title", 1]);
-
-# $di style
-$db = $di->get("db");
-$db->connect();
-$db->execute($sql, ["Some title", 1]);
+$last = $this->db->lastInsertId(); // 1
+$rows = $this->db->rowCount();     // 1
 ```
 
-
-
-Last insert id
-------------------
-
-You can check the last inserted id when doing INSERT where the primary key is auto generated.
+You can now query the table.
 
 ```php
-$sql = "INSERT INTO movie (title) VALUES (?);";
+$res = $this->db->select("*")
+                ->from("user")
+                ->where("id = 1")
+                ->execute()
+                ->fetch();
 
-# $app style
-$app->db->connect();
-$app->db->execute($sql, ["Some title"]);
-$id = $app->lastInsertId();
-
-# $di style
-$db = $di->get("db");
-$db->connect();
-$db->execute($sql, ["Some title"]);
-$id = $db->lastInsertId();
+$res->id;   // 1
+$res->age;  // 3
+$res->name; // "three"
 ```
 
+That is the basic usage and the idea is to create the SQL-queries using class methods and build tha actual SQL query behind the scene.
 
 
-Row count, affected rows
+
+<!--
+TODO
 ------------------
 
-You can check how many rows that are affected by the last INSERT, UPDATE, DELETE statement.
+Document the whole usecase using update, delete and more selects
+getSQL
+Execute standard SQL, just through the database class or through some method?
 
-```php
-$sql = "DELETE FROM movie;";
-
-# $app style
-$app->db->connect();
-$app->db->execute($sql);
-$num = $app->rowCount();
-
-# $di style
-$db = $di->get("db");
-$db->connect();
-$db->execute($sql);
-$num = $db->rowCount();
-```
+-->
 
 
 
-Throw exception on failure
+Dependency
 ------------------
 
-Exception are in general thrown as soon as something fails.
+This module depends upon, and extends, the database abstraction layer [`anax\database`](https://github.com/canax/database).
 
-The exception is module specific `Anax\Database\Exception\Exception` and contains details from the error message from the PDO layer, either from the statement or from the PDO-object, depending on what type of error happens.
+The module is usually used within an Anax installation but can also be used without Anax.
 
 
 
 License
 ------------------
 
-This software carries a MIT license.
+This software carries a MIT license. See [LICENSE.txt](LICENSE.txt) for details.
 
 
 

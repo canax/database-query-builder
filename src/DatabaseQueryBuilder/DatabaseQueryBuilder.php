@@ -32,7 +32,7 @@ class DatabaseQueryBuilder extends Database
 
 
     /**
-     * Execute a SQL-query and ignore the resultset.
+     * Execute a SQL-query.
      *
      * @param string|null|array $query  the SQL statement (or $params)
      * @param array             $params the params array

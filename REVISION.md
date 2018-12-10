@@ -3,6 +3,18 @@ Revision history
 
 
 
+v2.0.1 (2018-12-10)
+---------------------------------
+
+* Added README.
+* Removed Exception-class, not used.
+* Moved class QueryBuilder to test/.
+* Building upon anax/database ^2.2.
+* Remove composer.lock.
+* Unit testing for usecase used in README.
+
+
+
 v2.0.0 (2018-12-07)
 ---------------------------------
 

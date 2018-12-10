@@ -8,7 +8,7 @@ return [
         "dbqb" => [
             "shared" => true,
             "callback" => function () {
-                $obj = new \Anax\Database\DatabaseQueryBuilder();
+                $obj = new \Anax\DatabaseQueryBuilder\DatabaseQueryBuilder();
 
                 // Load the configuration files
                 $cfg = $this->get("configuration");
