@@ -3,10 +3,10 @@ Revision history
 
 
 
-v2.0.x (2018-12-10)
+v2.0.2 (2018-12-10)
 ---------------------------------
 
-* Update TOC in README.
+* Depend on anax/database.
 
 
 
