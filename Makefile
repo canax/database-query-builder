@@ -30,7 +30,7 @@ WARN_COLOR	= \033[33;01m
 ACTION_MESSAGE = $(ECHO) "$(ACTION)---> $(1)$(NO_COLOR)"
 
 # Which makefile am I in?
-WHERE-AM-I = $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+WHERE-AM-I = "$(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))"
 THIS_MAKEFILE := $(call WHERE-AM-I)
 
 # Echo some nice helptext based on the target comment
@@ -255,7 +255,8 @@ install-tools-php:
 
 	curl -Lso $(PHPCBF) https://squizlabs.github.io/PHP_CodeSniffer/phpcbf.phar && chmod 755 $(PHPCBF)
 
-	curl -Lso $(PHPMD) http://static.phpmd.org/php/latest/phpmd.phar && chmod 755 $(PHPMD)
+	curl -Lso $(PHPMD) https://github.com/phpmd/phpmd/releases/download/2.7.0/phpmd.phar && chmod 755 $(PHPMD)
+	# curl -Lso $(PHPMD) http://static.phpmd.org/php/latest/phpmd.phar && chmod 755 $(PHPMD)
 	# curl -Lso $(PHPMD) http://www.student.bth.se/~mosstud/download/phpmd.phar && chmod 755 $(PHPMD)
 
 	curl -Lso $(PHPLOC) https://phar.phpunit.de/phploc.phar && chmod 755 $(PHPLOC)
@@ -406,61 +407,61 @@ bats:
 .PHONY: theme
 theme:
 	@$(call HELPTEXT,$@)
-	[ ! -d theme ] || $(MAKE) --directory=theme build install
-	#[ ! -d theme ] || ( cd theme && make build install )
+	[ ! -d theme ] || $(MAKE) --directory=theme build
+	rsync -a theme/build/css htdocs/
 
 
 
-# ------------------------------------------------------------------------
-#
-# Cimage
-#
-
-define CIMAGE_CONFIG
-<?php
-return [
-    "mode"         => "development",
-    "image_path"   =>  __DIR__ . "/../img/",
-    "cache_path"   =>  __DIR__ . "/../../cache/cimage/",
-    "autoloader"   =>  __DIR__ . "/../../vendor/autoload.php",
-];
-endef
-export CIMAGE_CONFIG
-
-define GIT_IGNORE_FILES
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore
-endef
-export GIT_IGNORE_FILES
-
-# target: cimage-install          - Install Cimage in htdocs
-.PHONY: cimage-install
-cimage-install:
-	@$(call HELPTEXT,$@)
-	install -d htdocs/img htdocs/cimage cache/cimage
-	chmod 777 cache/cimage
-	$(ECHO) "$$GIT_IGNORE_FILES" | bash -c 'cat > cache/cimage/.gitignore'
-	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
-	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
-	touch htdocs/cimage/img_config.php
-
-# target: cimage-update           - Update Cimage to latest version.
-.PHONY: cimage-update
-cimage-update:
-	@$(call HELPTEXT,$@)
-	composer require mos/cimage
-	install -d htdocs/img htdocs/cimage cache/cimage
-	chmod 777 cache/cimage
-	$(ECHO) "$$GIT_IGNORE_FILES" | bash -c 'cat > cache/cimage/.gitignore'
-	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
-	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
-	touch htdocs/cimage/img_config.php
-
-# target: cimage-config-create    - Create configfile for Cimage.
-.PHONY: cimage-config-create
-cimage-config-create:
-	@$(call HELPTEXT,$@)
-	$(ECHO) "$$CIMAGE_CONFIG" | bash -c 'cat > htdocs/cimage/img_config.php'
-	cat htdocs/cimage/img_config.php
+# # ------------------------------------------------------------------------
+# #
+# # Cimage
+# #
+# 
+# define CIMAGE_CONFIG
+# <?php
+# return [
+#     "mode"         => "development",
+#     "image_path"   =>  __DIR__ . "/../img/",
+#     "cache_path"   =>  __DIR__ . "/../../cache/cimage/",
+#     "autoloader"   =>  __DIR__ . "/../../vendor/autoload.php",
+# ];
+# endef
+# export CIMAGE_CONFIG
+# 
+# define GIT_IGNORE_FILES
+# # Ignore everything in this directory
+# *
+# # Except this file
+# !.gitignore
+# endef
+# export GIT_IGNORE_FILES
+# 
+# # target: cimage-install          - Install Cimage in htdocs
+# .PHONY: cimage-install
+# cimage-install:
+# 	@$(call HELPTEXT,$@)
+# 	install -d htdocs/img htdocs/cimage cache/cimage
+# 	chmod 777 cache/cimage
+# 	$(ECHO) "$$GIT_IGNORE_FILES" | bash -c 'cat > cache/cimage/.gitignore'
+# 	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
+# 	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
+# 	touch htdocs/cimage/img_config.php
+# 
+# # target: cimage-update           - Update Cimage to latest version.
+# .PHONY: cimage-update
+# cimage-update:
+# 	@$(call HELPTEXT,$@)
+# 	composer require mos/cimage
+# 	install -d htdocs/img htdocs/cimage cache/cimage
+# 	chmod 777 cache/cimage
+# 	$(ECHO) "$$GIT_IGNORE_FILES" | bash -c 'cat > cache/cimage/.gitignore'
+# 	cp vendor/mos/cimage/webroot/img.php htdocs/cimage
+# 	cp vendor/mos/cimage/webroot/img/car.png htdocs/img/
+# 	touch htdocs/cimage/img_config.php
+# 
+# # target: cimage-config-create    - Create configfile for Cimage.
+# .PHONY: cimage-config-create
+# cimage-config-create:
+# 	@$(call HELPTEXT,$@)
+# 	$(ECHO) "$$CIMAGE_CONFIG" | bash -c 'cat > htdocs/cimage/img_config.php'
+# 	cat htdocs/cimage/img_config.php
