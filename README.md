@@ -25,8 +25,10 @@ The module is tested using MySQL and SQLite.
 Table of content
 ------------------
 
+<!--
 * [Install](#Install)
 * [Development](#Development)
+-->
 * [Class, interface, trait](#class-interface-trait)
 * [Exceptions](#exceptions)
 * [DI service](#di-service)
